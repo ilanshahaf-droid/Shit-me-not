@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>חרטטן! – משחק מבוסס חרטטוני</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap');
+  
+  :root {
+    --yellow: #FFEB3B;
+    --orange: #FF9800;
+    --red: #F44336;
+    --blue: #1565C0;
+    --dark-blue: #0D47A1;
+    --green: #4CAF50;
+    --black: #111;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: linear-gradient(160deg, #0D47A1 0%, #1565C0 40%, #FF6F00 100%);
+    min-height: 100vh;
+    color: #111;
+    overflow-x: hidden;
+  }
+  
+  .screen { display: none; min-height: 100vh; padding: 16px; }
+  .screen.active { display: block; }
+  
+  .container { max-width: 520px; margin: 0 auto; }
+  
+  .logo-area { text-align: center; margin: 20px 0 24px; }
+  .logo-area h1 {
+    font-size: 3.4rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #FFEB3B, #FF9800, #F44336);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 3px 3px 0 #000;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .tagline {
+    display: inline-block;
+    background: var(--yellow);
+    color: #000;
+    font-weight: 900;
+    font-size: 1rem;
+    padding: 5px 16px;
+    border-radius: 40px;
+    border: 3px solid #000;
+    transform: rotate(-2deg);
+    margin-top: 6px;
+  }
+  .based-on {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.9);
+    margin-top: 10px;
+    font-weight: 500;
+  }
+  
+  .card {
+    background: #fff;
+    border: 5px solid #000;
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 8px 8px 0 #000;
+  }
+  
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 900;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .players-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 10px 0;
+  }
+  .players-control button {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    border: 4px solid #000;
+    background: var(--yellow);
+    font-size: 2rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #000;
+  }
+  .players-control button:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #000; }
+  .player-num {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #E65100;
+    min-width: 80px;
+    text-align: center;
+  }
+  
+  .names-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .name-row label {
+    font-weight: 700;
+    min-width: 70px;
+    font-size: 0.95rem;
+  }
+  .name-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 3px solid #000;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .name-row input:focus {
+    outline: none;
+    border-color: #FF9800;
+  }
+  
+  .rounds-grid { display: grid; gap: 8px; }
+  .round-btn {
+    background: #E3F2FD;
+    border: 3px solid #000;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: right;
+  }
+  .round-btn.selected {
+    background: var(--yellow);
+    box-shadow: 3px 3px 0 #000;
+  }
+  .round-btn .desc {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: #555;
+    margin-top: 3px;
+  }
+  
+  .big-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    border: 5px solid #000;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 6px 6px 0 #000;
+    font-family: inherit;
+  }
+  .big-btn:active { transform: translate(3px,3px); box-shadow: 3px 3px 0 #000; }
+  .start-btn {
+    background: linear-gradient(90deg, #F44336, #FF9800);
+    color: white;
+    margin-top: 6px;
+  }
+  .next-btn { background: var(--yellow); color: #000; }
+  .danger-btn { background: #F44336; color: white; }
+  .success-btn { background: #4CAF50; color: white; }
+  
+  .header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .score-board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 14px;
+  }
+  .player-chip {
+    background: white;
+    border: 3px solid #000;
+    border-radius: 40px;
+    padding: 5px 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 3px 3px 0 #000;
+  }
+  .player-chip.active { background: var(--yellow); transform: scale(1.05); }
+  .player-chip .pts { color: #E65100; font-weight: 900; }
+  
+  .question-card {
+    background: white;
+    border: 5px solid #000;
+    border-radius: 18px;
+    padding: 12px 12px 10px;
+    text-align: center;
+    box-shadow: 6px 6px 0 #000;
+    margin-bottom: 8px;
+  }
+  .question-card .round-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  .question-card .q-text {
+    font-size: 1.4rem;
+    font-weight: 900;
+    line-height: 1.35;
+  }
+  
+  .timer {
+    font-size: 3rem;
+    font-weight: 900;
+    text-align: center;
+    color: white;
+    text-shadow: 3px 3px 0 #000;
+    margin: 8px 0;
+  }
+  .timer.warning { color: #FFEB3B; }
+  .timer.danger { color: #F44336; animation: pulse 0.5s infinite; }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  
+  .answer-box {
+    margin: 4px 0 4px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .answer-box input {
+    flex: 1;
+    padding: 11px 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: 3px solid #000;
+    border-radius: 12px;
+    font-family: inherit;
+    text-align: center;
+  }
+  .mic-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid #000;
+    background: #FFEB3B;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mic-btn.listening {
+    background: #F44336;
+    animation: pulse 0.8s infinite;
+  }
+  .mic-btn:active {
+    transform: translate(2px,2px);
+    box-shadow: 1px 1px 0 #000;
+  }
+  .answer-box input:focus {
+    outline: none;
+    border-color: #FF9800;
+    box-shadow: 0 0 0 4px rgba(255,152,0,0.25);
+  }
+  
+  .result-banner {
+    border: 4px solid #000;
+    border-radius: 18px;
+    padding: 16px;
+    margin: 12px 0;
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.25rem;
+  }
+  .result-banner.success {
+    background: #C8E6C9;
+    color: #1B5E20;
+  }
+  .result-banner.fail {
+    background: #FFCDD2;
+    color: #B71C1C;
+  }
+  .result-banner .detail {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .action-row .big-btn { font-size: 1.1rem; padding: 14px 8px; }
+  
+  .judge-area {
+    background: #FFF8E1;
+    border: 4px solid #000;
+    border-radius: 18px;
+    padding: 14px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  .judge-area h3 { margin-bottom: 10px; font-size: 1.1rem; }
+  
+  .explain-card {
+    background: white;
+    border: 5px solid #000;
+    border-radius: 24px;
+    padding: 24px 18px;
+    box-shadow: 8px 8px 0 #000;
+    text-align: center;
+  }
+  .explain-card h2 {
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+    color: #E65100;
+  }
+  .explain-card .how {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    text-align: right;
+    margin-bottom: 16px;
+  }
+  .explain-card .how li {
+    margin-bottom: 8px;
+    list-style: none;
+    position: relative;
+    padding-right: 16px;
+  }
+  .explain-card .how li::before {
+    content: "•";
+    position: absolute;
+    right: 0;
+    color: #FF9800;
+    font-weight: 900;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal {
+    background: white;
+    border: 6px solid #000;
+    border-radius: 28px;
+    padding: 24px 18px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 10px 10px 0 #000;
+    text-align: center;
+  }
+  .modal h2 { font-size: 1.5rem; margin-bottom: 10px; }
+  .modal p { margin-bottom: 16px; font-size: 1.05rem; }
+  
+  .podium { text-align: center; margin: 14px 0; }
+  .podium .winner {
+    font-size: 2.1rem;
+    font-weight: 900;
+    color: #E65100;
+    margin-bottom: 6px;
+  }
+  .final-scores { display: grid; gap: 8px; }
+  .final-row {
+    display: flex;
+    justify-content: space-between;
+    background: #E3F2FD;
+    border: 3px solid #000;
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-weight: 700;
+  }
+  .final-row:first-child { background: var(--yellow); }
+  
+  .footer-note {
+    text-align: center;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.78rem;
+    margin-top: 18px;
+    line-height: 1.5;
+  }
+  
+  .auto-note {
+    background: #E8F5E9;
+    border: 3px solid #2E7D32;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    text-align: center;
+    color: #1B5E20;
+    font-weight: 600;
+  }
+  
+  .img-frame {
+    margin: 2px auto 0;
+    max-width: 240px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 8px solid #4CAF50;
+    box-shadow: 0 0 0 3px #000;
+    background: #eee;
+  }
+  .img-frame.red {
+    border-color: #F44336;
+  }
+  .img-frame img {
+    display: block;
+    width: 100%;
+    height: 130px;
+    object-fit: contain;
+    background: #eee;
+  }
+  @media (max-width: 420px) {
+    .img-frame {
+      max-width: 200px;
+      border-width: 7px;
+    }
+    .img-frame img {
+      height: 115px;
+    }
+    .question-card {
+      padding: 6px 6px 4px !important;
+      margin-bottom: 4px !important;
+      border-width: 3px !important;
+    }
+    .question-card .round-name {
+      display: none !important; /* hide "תמו-NOT" text to save space */
+    }
+    .header-bar {
+      margin-bottom: 4px !important;
+      font-size: 0.8rem !important;
+    }
+    .score-board { display: none !important; }
+    .container { padding: 8px !important; }
+  }
+  
+  .mini-timer {
+    display: inline-block;
+    background: #000;
+    color: #FFEB3B;
+    font-weight: 900;
+    font-size: 1.1rem;
+    padding: 2px 12px;
+    border-radius: 20px;
+    border: 2px solid #FFEB3B;
+    margin-bottom: 6px;
+  }
+  .mini-timer.danger {
+    color: #F44336;
+    border-color: #F44336;
+    animation: pulse 0.5s infinite;
+  }
+  .color-label {
+    font-size: 1.15rem;
+    font-weight: 900;
+    margin-top: 8px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    display: inline-block;
+    border: 3px solid #000;
+  }
+  .color-label.green {
+    background: #4CAF50;
+    color: white;
+  }
+  .color-label.red {
+    background: #F44336;
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<div id="setup" class="screen active">
+  <div class="container">
+    <div class="logo-area">
+      <h1>חרטטן!</h1>
+      <div class="tagline">רק תשובות לא נכונות!</div>
+      <div class="based-on">מבוסס על המשחק והשעשועון חרטטוני<br>של אור בוטבול ועמרי הכהן</div>
+    </div>
+    
+    <div class="card">
+      <div class="section-title">👥 כמה משתתפים?</div>
+      <div class="players-control">
+        <button onclick="changePlayers(-1)">−</button>
+        <div class="player-num" id="playerCount">4</div>
+        <button onclick="changePlayers(1)">+</button>
+      </div>
+      <div style="text-align:center;color:#666;font-size:0.85rem;margin-bottom:8px">2 עד 99 שחקנים</div>
+      <div class="names-list" id="namesList"></div>
+    </div>
+    
+    <div class="card">
+      <div class="section-title">🔥 בחר סיבובים</div>
+      <div class="rounds-grid" id="roundsList"></div>
+      <div class="auto-note">
+        ✅ האפליקציה בודקת אוטומטית אם התשובה קרובה מדי לנכונה
+      </div>
+    </div>
+    
+    <button class="big-btn start-btn" onclick="startGame()">יאללה משחקים! ←</button>
+    
+    <div class="footer-note">
+      משחק ביתי בהשראת חרטטוני<br>
+      האפליקציה פוסלת תשובות קרובות מדי לנכונות
+    </div>
+  </div>
+</div>
+
+<!-- EXPLAIN -->
+<div id="explain" class="screen">
+  <div class="container">
+    <div class="logo-area" style="margin-bottom:14px">
+      <h1 style="font-size:2.3rem">חרטטן!</h1>
+    </div>
+    <div class="explain-card">
+      <h2 id="explainTitle">שם הסיבוב</h2>
+      <ul class="how" id="explainText"></ul>
+      <button class="big-btn next-btn" onclick="beginRound()">הבנתי, מתחילים! →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game" class="screen">
+  <div class="container">
+    <div class="header-bar">
+      <div id="roundLabel">סיבוב</div>
+      <div id="qCounter">שאלה 1</div>
+    </div>
+    
+    <div class="score-board" id="scoreBoard"></div>
+    
+    <div class="question-card">
+      <div class="round-name" id="currentRoundName"></div>
+      <div class="q-text" id="questionText">טוען...</div>
+    </div>
+    
+    <div class="timer" id="timerDisplay" style="display:none">5</div>
+    
+    <div id="gameActions"></div>
+    
+    <div id="resultArea" style="display:none"></div>
+    
+    <div class="judge-area" id="judgeArea" style="display:none">
+      <h3>שיפוט ידני (רק אם צריך)</h3>
+      <div class="action-row">
+        <button class="big-btn success-btn" onclick="manualAward(true)">✅ קבל</button>
+        <button class="big-btn danger-btn" onclick="manualAward(false)">❌ פסול</button>
+      </div>
+      <button class="big-btn next-btn" style="margin-top:10px" onclick="nextQuestion()">השאלה הבאה →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="screen">
+  <div class="container">
+    <div class="logo-area">
+      <h1>חרטטן!</h1>
+      <div class="tagline">סיום המשחק</div>
+    </div>
+    <div class="card">
+      <div class="podium">
+        <div class="winner" id="winnerName">המנצח</div>
+        <div style="font-size:1.15rem;font-weight:700">🏆 אלוף החרטטנים!</div>
+      </div>
+      <div class="final-scores" id="finalScores"></div>
+    </div>
+    <button class="big-btn start-btn" onclick="location.reload()">משחק חדש</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-overlay" style="display:none">
+  <div class="modal">
+    <h2 id="modalTitle"></h2>
+    <p id="modalText"></p>
+    <button class="big-btn next-btn" onclick="closeModal()">המשך</button>
+  </div>
+</div>
+
+<script>
+// ========== DATA ==========
+const ROUNDS = [
+  {
+    id: 'fast',
+    name: '⚡ הסיבוב המהיר',
+    shortDesc: 'שאלות ברצף – תשובה שגויה אבל בקטגוריה',
+    explain: [
+      'המנחה שואל שאלות במהירות.',
+      'השחקן מקליד תשובה <strong>שגויה</strong> שעדיין קשורה לנושא.',
+      'האפליקציה בודקת אוטומטית אם התשובה קרובה מדי לנכונה → פוסלת.',
+      'אם היא שונה מספיק → מקבלים נקודה.',
+      'כל תשובה מוצלחת = 1 נקודה.'
+    ],
+    time: 12,
+    points: 1
+  },
+  {
+    id: 'head',
+    name: '🥊 ראש בראש',
+    shortDesc: 'תשובה מוצלחת מזכה',
+    explain: [
+      'כל שחקן מקליד תשובה שגויה לשאלה.',
+      'האפליקציה פוסלת אוטומטית תשובות שקרובות מדי לנכונה.',
+      'תשובה שונה מספיק = נקודה.',
+      'מי עם יותר נקודות בסוף מוביל.'
+    ],
+    time: 14,
+    points: 1
+  },
+  {
+    id: 'dynamite',
+    name: '💣 סיבוב הדינמיט',
+    shortDesc: '5 שניות – אחרת מפסידים נקודות',
+    explain: [
+      'שאלה אחת עוברת בין השחקנים.',
+      'כל אחד חייב להקליד תשובה שגויה תוך 5 שניות.',
+      'האפליקציה בודקת אוטומטית.',
+      'כישלון או איחור = הפסד של 2 נקודות.'
+    ],
+    time: 7,
+    points: 1,
+    penalty: 2
+  },
+  {
+    id: 'tmonot',
+    name: '🖼️ תמו-NOT',
+    shortDesc: 'ירוק = אמת | אדום = חרטוט',
+    explain: [
+      'מוצגת <strong>תמונה אמיתית</strong> עם מסגרת ירוקה או אדומה.',
+      '<strong>מסגרת ירוקה</strong> = רק תשובה נכונה.',
+      '<strong>מסגרת אדומה</strong> = רק תשובה שגויה (מחורטטת).',
+      'אין שאלה כתובה – רק התמונה והמסגרת.'
+    ],
+    time: 14,
+    points: 2
+  },
+  {
+    id: 'verified',
+    name: '🕵️ מאומת או מחורטט',
+    shortDesc: 'שני סיפורים – אחד אמת ואחד חרטוט',
+    explain: [
+      'השחקן מספר שני דברים (בעל פה).',
+      'אחד מאומת ואחד מחורטט.',
+      'השחקן השני מנחש.',
+      'כאן עדיין צריך שיפוט אנושי (כי זה סיפור חופשי).'
+    ],
+    time: 30,
+    points: 5,
+    manual: true
+  }
+];
+
+// Each question has: text, correct (array of accepted correct answers)
+const QUESTIONS = {
+  fast: [
+    { text: "איזה פרי הוא אדום?", correct: ["תפוח", "תפוז אדום", "דובדבן", "תות", "רימון", "תפוח אדום"] },
+    { text: "מה בירת צרפת?", correct: ["פריז", "paris", "פאריס", "פריס"] },
+    { text: "כמה רגליים יש לכלב?", correct: ["4", "ארבע", "ארבעה"] },
+    { text: "מה צבע השמיים ביום בהיר?", correct: ["כחול", "תכלת"] },
+    { text: "איזה חיה אומרת 'מיאו'?", correct: ["חתול", "חתולה", "חתלתול"] },
+    { text: "מה עושים עם מברשת שיניים?", correct: ["צוחצים שיניים", "צחצוח", "מצחצחים", "לצחצח שיניים"] },
+    { text: "איזה יום בא אחרי יום שני?", correct: ["שלישי", "יום שלישי"] },
+    { text: "כמה ימים יש בשבוע?", correct: ["7", "שבע"] },
+    { text: "מה השם של הכוכב שלנו?", correct: ["שמש", "השמש", "סול"] },
+    { text: "איזה צבע מתקבל כשמערבבים אדום וצהוב?", correct: ["כתום", "אורנג"] },
+    { text: "מה שותים בבוקר רוב האנשים?", correct: ["קפה", "תה", "מיץ", "חלב"] },
+    { text: "איזה כלי נגינה יש לו מיתרים?", correct: ["גיטרה", "כינור", "פסנתר", "נבל", "עוד"] },
+    { text: "מה עושה שען?", correct: ["מתקן שעונים", "תיקון שעונים", "שען"] },
+    { text: "איזה עונה מגיעה אחרי הקיץ?", correct: ["סתיו", "הסתיו"] },
+    { text: "כמה אצבעות יש ביד אחת?", correct: ["5", "חמש"] },
+    { text: "איפה שמים את המפתחות בדרך כלל?", correct: ["בכיס", "בתיק", "בתלייה", "במגירה"] },
+    { text: "מה הצבע של דגל יפן?", correct: ["לבן ואדום", "אדום ולבן", "לבן עם עיגול אדום"] },
+    { text: "איזה בעל חיים הכי מהיר ביבשה?", correct: ["ציטה", "צ'יטה", "ברדלס"] }
+  ],
+  head: [
+    { text: "מה הדבר הכי חם בעולם?", correct: ["שמש", "השמש", "ליבת כדור הארץ", "לבה"] },
+    { text: "איך קוראים למי שמתקן נעליים?", correct: ["סנדלר", "רצען"] },
+    { text: "מה קורה אם שמים מלח במים?", correct: ["נמס", "מתמוסס", "המלח נמס"] },
+    { text: "איזה ספורט משחקים עם כדור סל?", correct: ["כדורסל", "בסקטבול"] },
+    { text: "איפה גרים הפינגווינים?", correct: ["אנטארקטיקה", "הקוטב הדרומי"] },
+    { text: "מה עושה רופא שיניים?", correct: ["מטפל בשיניים", "מרפא שיניים", "עקירות", "סתימות"] },
+    { text: "מה המרכיב העיקרי בלחם?", correct: ["קמח", "מים", "שמרים"] },
+    { text: "איך קוראים לתינוק של הפרה?", correct: ["עגל", "עגלה"] },
+    { text: "מה עושה חקלאי?", correct: ["מגדל יבולים", "עובד בשדה", "חקלאות"] },
+    { text: "איזה פרי גדל על עץ תפוח?", correct: ["תפוח", "תפוחים"] }
+  ],
+  dynamite: [
+    { text: "מה עושים עם מטרייה?", correct: ["מתגוננים מגשם", "הגנה מגשם", "פותחים בגשם"] },
+    { text: "איזה כלי תחבורה עף בשמיים?", correct: ["מטוס", "מסוק", "ספינת אוויר"] },
+    { text: "מה צבע העשב?", correct: ["ירוק"] },
+    { text: "מה שותים כשצמאים?", correct: ["מים", "מיץ", "שתיה"] },
+    { text: "איזה יום הוא היום הראשון בשבוע בישראל?", correct: ["ראשון", "יום ראשון"] },
+    { text: "מה עושה טבח במסעדה?", correct: ["מבשל", "מכין אוכל", "בישול"] },
+    { text: "איפה שמים את הכסף בארנק?", correct: ["בארנק", "בכיס"] },
+    { text: "מה הצבע של בננה בשלה?", correct: ["צהוב"] }
+  ],
+  tmonot: [
+    { text: "בננה", correct: ["בננה", "בננות", "צהוב", "צהובה", "בננה צהובה", "בננות צהובות", "banana", "bananas"], mode: "true",
+      img: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "כלב", correct: ["כלב", "כלבה", "כלבים", "כלבות", "dog", "puppy", "כלבלב"], mode: "true",
+      img: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "תפוח", correct: ["תפוח", "תפוחים", "אדום", "אדומה", "תפוח אדום", "apple", "apples"], mode: "true",
+      img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "כדורגל", correct: ["כדורגל", "כדור", "כדורים", "soccer", "football", "פוטבול"], mode: "true",
+      img: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "חתול", correct: ["חתול", "חתולה", "חתולים", "חתלתול", "cat", "kitty"], mode: "true",
+      img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "פרח", correct: ["פרח", "פרחים", "ורד", "שושנה", "flower", "rose"], mode: "true",
+      img: "https://images.unsplash.com/photo-1490750965869-43177a2ea78b?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "ספר", correct: ["ספר", "ספרים", "book", "books"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "כיסא", correct: ["כיסא", "כסא", "כיסאות", "chair", "chairs", "שולחן"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "מכונית", correct: ["מכונית", "רכב", "אוטו", "מכוניות", "car", "cars", "אדום", "אדומה"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "שמש", correct: ["שמש", "השמש", "sun", "צהוב", "צהובה"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1507400492013-162706c8c05e?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "עץ", correct: ["עץ", "עצים", "tree", "trees"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "בית", correct: ["בית", "בתים", "house", "home"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=400&h=300&q=80" }
+  ],
+  verified: [
+    { text: "ספר שני דברים על עצמך – אחד אמיתי ואחד מומצא. השני מנחש.", correct: [], manual: true },
+    { text: "תאר חוויה מהשבוע – האם היא אמיתית או מומצאת?", correct: [], manual: true },
+    { text: "מה התחביב הכי מוזר שלך? (אמיתי או מומצא)", correct: [], manual: true },
+    { text: "ספר על המקום הכי רחוק שהיית בו – האם זה אמיתי?", correct: [], manual: true },
+    { text: "מה הדבר הכי מביך שקרה לך? אמיתי או מומצא?", correct: [], manual: true }
+  ]
+};
+
+// ========== STATE ==========
+let playerCount = 4;
+let selectedRounds = ['fast', 'head', 'dynamite', 'tmonot', 'verified'];
+let players = [];
+let currentRoundId = null;
+let currentRoundQuestions = [];
+let currentQIndex = 0;
+let currentPlayerIndex = 0;
+let timerInterval = null;
+let timeLeft = 0;
+let roundQueue = [];
+let roundQueueIndex = 0;
+let currentIsGreen = true;
+
+// ========== HELPERS ==========
+function normalize(str) {
+  return (str || "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[^\u0590-\u05FFa-z0-9\s]/gi, "")
+    .replace(/\s+/g, " ");
+}
+
+function isTooCloseToCorrect(answer, correctList) {
+  if (!correctList || correctList.length === 0) return false;
+  const a = normalize(answer);
+  if (!a) return true;
+  
+  for (const c of correctList) {
+    const corr = normalize(c);
+    if (!corr) continue;
+    if (a === corr || a.includes(corr) || corr.includes(a)) return true;
+    // also accept if one is the other + common plural suffix
+    if (a === corr + "ות" || a === corr + "ים" || a === corr + "ה" || 
+        corr === a + "ות" || corr === a + "ים" || corr === a + "ה") return true;
+  }
+  return false;
+}
+
+// ========== SETUP ==========
+function changePlayers(delta) {
+  playerCount = Math.max(2, Math.min(99, playerCount + delta));
+  document.getElementById('playerCount').textContent = playerCount;
+  renderNameInputs();
+}
+
+function renderNameInputs() {
+  const list = document.getElementById('namesList');
+  const existing = {};
+  list.querySelectorAll('input').forEach(inp => {
+    existing[inp.dataset.idx] = inp.value;
+  });
+  list.innerHTML = '';
+  for (let i = 0; i < playerCount; i++) {
+    const row = document.createElement('div');
+    row.className = 'name-row';
+    const val = existing[i] !== undefined ? existing[i] : `שחקן ${i+1}`;
+    row.innerHTML = `
+      <label>שחקן ${i+1}</label>
+      <input type="text" data-idx="${i}" value="${val}" maxlength="16" placeholder="הכנס שם...">
+    `;
+    list.appendChild(row);
+  }
+}
+
+function renderRounds() {
+  const list = document.getElementById('roundsList');
+  list.innerHTML = '';
+  ROUNDS.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'round-btn' + (selectedRounds.includes(r.id) ? ' selected' : '');
+    div.innerHTML = `${r.name}<div class="desc">${r.shortDesc}</div>`;
+    div.onclick = () => toggleRound(r.id, div);
+    list.appendChild(div);
+  });
+}
+
+function toggleRound(id, el) {
+  if (selectedRounds.includes(id)) {
+    if (selectedRounds.length === 1) return;
+    selectedRounds = selectedRounds.filter(x => x !== id);
+    el.classList.remove('selected');
+  } else {
+    selectedRounds.push(id);
+    el.classList.add('selected');
+  }
+}
+
+function startGame() {
+  players = [];
+  document.querySelectorAll('#namesList input').forEach((inp, i) => {
+    const name = (inp.value || '').trim() || `שחקן ${i+1}`;
+    players.push({ name, score: 0 });
+  });
+  
+  roundQueue = selectedRounds.slice();
+  roundQueueIndex = 0;
+  
+  document.getElementById('setup').classList.remove('active');
+  showExplainForCurrentRound();
+}
+
+// ========== EXPLAIN + ROUND ==========
+function showExplainForCurrentRound() {
+  if (roundQueueIndex >= roundQueue.length) {
+    endGame();
+    return;
+  }
+  currentRoundId = roundQueue[roundQueueIndex];
+  const round = ROUNDS.find(r => r.id === currentRoundId);
+  
+  document.getElementById('explainTitle').textContent = round.name;
+  document.getElementById('explainText').innerHTML = round.explain.map(l => `<li>${l}</li>`).join('');
+  
+  document.getElementById('explain').classList.add('active');
+  document.getElementById('game').classList.remove('active');
+}
+
+function beginRound() {
+  const qs = QUESTIONS[currentRoundId] || [];
+  const take = Math.min(qs.length, Math.max(4, Math.min(7, players.length + 2)));
+  currentRoundQuestions = [...qs].sort(() => Math.random() - 0.5).slice(0, take);
+  currentQIndex = 0;
+  currentPlayerIndex = 0;
+  
+  document.getElementById('explain').classList.remove('active');
+  document.getElementById('game').classList.add('active');
+  renderScoreBoard();
+  showQuestion();
+}
+
+// ========== GAME ==========
+function renderScoreBoard() {
+  // Live scores hidden – shown only at end of round
+  const board = document.getElementById('scoreBoard');
+  if (board) board.style.display = 'none';
+}
+
+function showQuestion() {
+  if (currentQIndex >= currentRoundQuestions.length) {
+    roundQueueIndex++;
+    showExplainForCurrentRound();
+    return;
+  }
+  
+  const q = currentRoundQuestions[currentQIndex];
+  const round = ROUNDS.find(r => r.id === currentRoundId);
+  
+  document.getElementById('currentRoundName').textContent = currentRoundId === 'tmonot' ? '' : round.name;
+  document.getElementById('roundLabel').textContent = round.name;
+  document.getElementById('qCounter').textContent = `שאלה ${currentQIndex + 1}/${currentRoundQuestions.length}`;
+  
+  // Hide big timer, we use mini
+  const bigTimer = document.getElementById('timerDisplay');
+  if (bigTimer) bigTimer.style.display = 'none';
+
+  if (currentRoundId === 'tmonot') {
+    currentIsGreen = q.mode === 'true' ? true : (q.mode === 'fake' ? false : Math.random() > 0.5);
+    const frameClass = currentIsGreen ? 'img-frame' : 'img-frame red';
+    const imgSrc = q.img || '';
+    document.getElementById('questionText').innerHTML = `
+      <div class="${frameClass}">
+        <img src="${imgSrc}" alt="תמונה" onerror="this.src='https://via.placeholder.com/400x300?text=תמונה'">
+      </div>
+    `;
+  } else {
+    document.getElementById('questionText').textContent = q.text;
+  }
+  
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('judgeArea').style.display = 'none';
+  
+  const actions = document.getElementById('gameActions');
+  
+  if (round.manual || currentRoundId === 'verified') {
+    actions.innerHTML = `
+      <p style="color:white;text-align:center;margin-bottom:12px;font-weight:700;line-height:1.4">
+        תור: <strong>${players[currentPlayerIndex].name}</strong><br>
+        ספר / ענה בקול → השחקן הבא מנחש
+      </p>
+      <div class="action-row">
+        <button class="big-btn success-btn" onclick="guessVerified(true)">מאומת</button>
+        <button class="big-btn danger-btn" onclick="guessVerified(false)">מחורטט</button>
+      </div>
+    `;
+    startTimer(round.time, () => showManualJudge());
+  } else {
+    actions.innerHTML = `
+      <div style="text-align:center;margin:0 0 2px">
+        <span class="mini-timer" id="inlineTimer" style="display:none"></span>
+        <span style="color:white;font-weight:700;font-size:0.85rem;margin-right:8px">${players[currentPlayerIndex].name}</span>
+      </div>
+      <div class="answer-box">
+        <input type="text" id="answerInput" placeholder="הקלד או לחץ על המיקרופון..." autocomplete="off" enterkeyhint="done">
+        <button class="mic-btn" id="micBtn" type="button" title="הכרה קולית">🎤</button>
+      </div>
+      <button class="big-btn next-btn" id="sendBtn" style="padding:10px;font-size:1.1rem;display:none;margin-top:4px" onclick="submitAnswer()">שלח ←</button>
+    `;
+    setTimeout(() => {
+      const inp = document.getElementById('answerInput');
+      if (inp) {
+        inp.focus();
+        inp.addEventListener('input', function() {
+          const btn = document.getElementById('sendBtn');
+          if (btn) btn.style.display = this.value.trim() ? 'block' : 'none';
+        });
+      }
+      setupSpeechRecognition();
+    }, 60);
+    
+    startTimer(round.time, () => {
+      if (currentRoundId === 'dynamite') {
+        players[currentPlayerIndex].score = Math.max(0, players[currentPlayerIndex].score - (round.penalty || 2));
+        showAutoResult(false, `נגמר הזמן! ${players[currentPlayerIndex].name} מאבד ${round.penalty || 2} נקודות`);
+        renderScoreBoard();
+        setTimeout(() => nextQuestion(), 1800);
+      } else {
+        submitAnswer(true);
+      }
+    });
+  }
+  
+  renderScoreBoard();
+}
+
+function startTimer(seconds, onEnd) {
+  clearInterval(timerInterval);
+  timeLeft = seconds;
+  
+  function updateDisplays() {
+    const display = document.getElementById('timerDisplay');
+    const inline = document.getElementById('inlineTimer');
+    if (display) {
+      display.style.display = 'none'; // keep big one hidden
+    }
+    if (inline) {
+      inline.style.display = 'inline-block';
+      inline.textContent = timeLeft;
+      inline.className = timeLeft <= 3 ? 'mini-timer danger' : 'mini-timer';
+    }
+  }
+  updateDisplays();
+  
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateDisplays();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      const inline = document.getElementById('inlineTimer');
+      if (inline) inline.style.display = 'none';
+      if (onEnd) onEnd();
+    }
+  }, 1000);
+}
+
+function submitAnswer(isTimeout = false) {
+  clearInterval(timerInterval);
+  document.getElementById('timerDisplay').style.display = 'none';
+  
+  const q = currentRoundQuestions[currentQIndex];
+  const round = ROUNDS.find(r => r.id === currentRoundId);
+  const input = document.getElementById('answerInput');
+  const answer = input ? input.value.trim() : '';
+  
+  document.getElementById('gameActions').innerHTML = '';
+  
+  let success = false;
+  let message = '';
+  
+  if (currentRoundId === 'tmonot') {
+    const tooClose = isTooCloseToCorrect(answer, q.correct);
+    if (currentIsGreen) {
+      success = tooClose;
+      message = success ? 'נכון! תשובה אמיתית התקבלה' : 'פסול – היית צריך תשובה אמיתית';
+    } else {
+      success = !tooClose && answer.length > 0;
+      message = success ? 'חרטוט מוצלח!' : (tooClose ? 'פסול – קרוב מדי לנכון' : 'פסול – תשובה ריקה');
+    }
+  } else {
+    const tooClose = isTooCloseToCorrect(answer, q.correct);
+    if (!answer) {
+      success = false;
+      message = 'פסול – לא הוקלדה תשובה';
+    } else if (tooClose) {
+      success = false;
+      message = 'פסול – התשובה קרובה מדי לנכונה!';
+    } else {
+      success = true;
+      message = 'חרטוט מוצלח! האפליקציה אישרה';
+    }
+  }
+  
+  if (success) {
+    players[currentPlayerIndex].score += round.points;
+  }
+  
+  showAutoResult(success, message);
+  renderScoreBoard();
+}
+
+function showAutoResult(success, message) {
+  const area = document.getElementById('resultArea');
+  area.style.display = 'block';
+  area.innerHTML = `
+    <div class="result-banner ${success ? 'success' : 'fail'}">
+      ${success ? '✅ ' + message : '❌ ' + message}
+      <div class="detail">${success ? `+${ROUNDS.find(r=>r.id===currentRoundId).points} נקודות` : 'לא נוספו נקודות'}</div>
+    </div>
+    <button class="big-btn next-btn" onclick="nextQuestion()">השאלה הבאה →</button>
+    <div style="margin-top:10px;text-align:center">
+      <button onclick="showManualJudge()" style="background:none;border:none;color:#fff;text-decoration:underline;font-size:0.9rem;cursor:pointer">
+        לא מסכים? שיפוט ידני
+      </button>
+    </div>
+  `;
+}
+
+function showManualJudge() {
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('judgeArea').style.display = 'block';
+}
+
+function manualAward(success) {
+  const round = ROUNDS.find(r => r.id === currentRoundId);
+  if (success) {
+    players[currentPlayerIndex].score += round.points;
+    showModal('✅ התקבל ידנית', `+${round.points} נקודות`);
+  } else {
+    showModal('❌ נפסל ידנית', 'לא נוספו נקודות');
+  }
+  renderScoreBoard();
+  document.getElementById('judgeArea').style.display = 'none';
+  setTimeout(() => nextQuestion(), 1200);
+}
+
+function guessVerified(saidVerified) {
+  clearInterval(timerInterval);
+  document.getElementById('timerDisplay').style.display = 'none';
+  document.getElementById('gameActions').innerHTML = `
+    <p style="color:white;text-align:center;margin-bottom:12px">
+      ניחש: <strong>${saidVerified ? 'מאומת' : 'מחורטט'}</strong><br>
+      המנחה – האם הניחוש נכון?
+    </p>
+  `;
+  document.getElementById('judgeArea').style.display = 'block';
+}
+
+function nextQuestion() {
+  clearInterval(timerInterval);
+  document.getElementById('timerDisplay').style.display = 'none';
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('judgeArea').style.display = 'none';
+  
+  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+  currentQIndex++;
+  showQuestion();
+}
+
+function endGame() {
+  document.getElementById('game').classList.remove('active');
+  document.getElementById('explain').classList.remove('active');
+  document.getElementById('results').classList.add('active');
+  
+  const sorted = [...players].sort((a,b) => b.score - a.score);
+  document.getElementById('winnerName').textContent = sorted[0].name;
+  
+  const list = document.getElementById('finalScores');
+  list.innerHTML = '';
+  sorted.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'final-row';
+    row.innerHTML = `<span>${i+1}. ${p.name}</span><span>${p.score} נק׳</span>`;
+    list.appendChild(row);
+  });
+}
+
+function showModal(title, text) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalText').textContent = text;
+  document.getElementById('modal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+
+// ========== SPEECH RECOGNITION ==========
+let recognition = null;
+let isListening = false;
+
+function setupSpeechRecognition() {
+  const micBtn = document.getElementById('micBtn');
+  if (!micBtn) return;
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    micBtn.style.opacity = '0.4';
+    micBtn.title = 'הכרה קולית לא נתמכת בדפדפן זה';
+    micBtn.onclick = () => alert('הכרה קולית לא נתמכת בדפדפן הזה.\nנסה Chrome במובייל או במחשב.');
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'he-IL';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+  recognition.continuous = false;
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add('listening');
+    micBtn.textContent = '🔴';
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '🎤';
+  };
+
+  recognition.onerror = (e) => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    micBtn.textContent = '🎤';
+    if (e.error === 'not-allowed') {
+      alert('יש לאפשר גישה למיקרופון בהגדרות הדפדפן');
+    }
+  };
+
+  recognition.onresult = (event) => {
+    const result = event.results[0][0].transcript;
+    const inp = document.getElementById('answerInput');
+    if (inp) {
+      inp.value = result.trim();
+      const btn = document.getElementById('sendBtn');
+      if (btn) btn.style.display = inp.value.trim() ? 'block' : 'none';
+      // auto-submit after short delay? better let user confirm
+    }
+  };
+
+  micBtn.onclick = () => {
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+    try {
+      recognition.start();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+}
+
+
+// init
+renderNameInputs();
+renderRounds();
+</script>
+</body>
+</html>
