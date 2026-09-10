@@ -1,0 +1,26 @@
+{
+  "name": "חרטטן! – משחק מבוסס חרטטוני",
+  "short_name": "חרטטן!",
+  "description": "משחק מסיבות שבו רק תשובות לא נכונות הן הנכונות. מבוסס על חרטטוני.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0D47A1",
+  "theme_color": "#0D47A1",
+  "orientation": "portrait",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

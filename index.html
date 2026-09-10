@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>חרטטן! – משחק מבוסס חרטטוני</title>
+<meta name="theme-color" content="#0D47A1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="חרטטן!">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap');
   
@@ -1223,6 +1231,15 @@ function setupSpeechRecognition() {
 // init
 renderNameInputs();
 renderRounds();
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('PWA ready', reg.scope))
+      .catch(err => console.log('SW failed', err));
+  });
+}
 </script>
 </body>
 </html>
