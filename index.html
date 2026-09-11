@@ -618,6 +618,7 @@
       <div class="section-title" style="justify-content:center">קוד הצטרפות</div>
       <div class="room-code" id="hostRoomCode">----</div>
       <div style="font-size:0.85rem;color:#666;margin-top:4px">שחקנים בוחרים "אני שחקן" ומקלידים את הקוד הזה</div>
+      <button class="big-btn" style="background:#25D366;color:white;margin-top:12px;font-size:1.05rem;padding:12px" onclick="shareRoomLink()">📲 שלח קישור הצטרפות בוואטסאפ</button>
     </div>
     <div class="card">
       <div class="section-title">👥 שחקנים שהצטרפו (<span id="hostPlayerCount">0</span>)</div>
@@ -1678,6 +1679,13 @@ function hostCreateRoom() {
   });
 }
 
+function shareRoomLink() {
+  if (!myRoomCode) return;
+  const joinUrl = location.origin + location.pathname + '?room=' + myRoomCode;
+  const msg = `בואו לשחק חרטטן! 🎉\nהצטרפו כאן: ${joinUrl}\nאו הזינו את הקוד ${myRoomCode} ידנית באפליקציה.`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
 function renderHostLobby(room) {
   const players = room.players || {};
   const ids = Object.keys(players);
@@ -2066,6 +2074,19 @@ function showKScoresModal() {
 // init
 renderNameInputs();
 renderRounds('roundsList');
+
+// If opened via a shared "?room=CODE" link, jump straight to the join screen.
+(function checkJoinLink() {
+  const roomFromUrl = new URLSearchParams(location.search).get('room');
+  if (roomFromUrl) {
+    showScreen('playerJoin');
+    const codeInput = document.getElementById('joinCodeInput');
+    if (codeInput) {
+      codeInput.value = roomFromUrl.toUpperCase();
+      setTimeout(() => document.getElementById('joinNameInput').focus(), 100);
+    }
+  }
+})();
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
