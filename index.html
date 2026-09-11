@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>חרטטן! – משחק מבוסס חרטטוני</title>
-<meta name="theme-color" content="#0D47A1">
+<meta name="theme-color" content="#0B1130">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="חרטטן!">
@@ -12,24 +12,34 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap');
   
   :root {
-    --yellow: #FFEB3B;
+    --yellow: #FFC933;
+    --gold: #FFC933;
     --orange: #FF9800;
-    --red: #F44336;
+    --red: #EF3350;
+    --magenta: #FF3D71;
+    --cyan: #17D9C4;
     --blue: #1565C0;
     --dark-blue: #0D47A1;
-    --green: #4CAF50;
+    --green: #17B978;
     --black: #111;
+    --stage-navy: #0B1130;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; }
   
   body {
     font-family: 'Heebo', sans-serif;
-    background: linear-gradient(160deg, #0D47A1 0%, #1565C0 40%, #FF6F00 100%);
+    background:
+      radial-gradient(ellipse 900px 520px at 18% -8%, rgba(255,201,51,0.24), transparent 60%),
+      radial-gradient(ellipse 900px 560px at 102% 4%, rgba(255,61,113,0.26), transparent 58%),
+      radial-gradient(ellipse 1100px 700px at 50% 115%, rgba(61,16,99,0.55), transparent 65%),
+      var(--stage-navy);
     min-height: 100vh;
     color: #111;
     overflow-x: hidden;
@@ -40,26 +50,46 @@
   
   .container { max-width: 520px; margin: 0 auto; }
   
-  .logo-area { text-align: center; margin: 20px 0 24px; }
+  .logo-area { position: relative; text-align: center; margin: 20px 0 24px; }
+  .logo-area::before, .logo-area::after {
+    content: "";
+    display: block;
+    height: 10px;
+    max-width: 260px;
+    margin: 0 auto 8px;
+    background-image: radial-gradient(circle, #FFE9A8 0 3px, transparent 4px);
+    background-size: 24px 10px;
+    background-repeat: repeat-x;
+    background-position: center;
+    filter: drop-shadow(0 0 4px rgba(255,201,51,0.85));
+  }
+  .logo-area::after { margin: 10px auto 0; }
+  @keyframes marquee-in {
+    0% { opacity: 0; transform: translateY(-10px) scale(0.94); }
+    60% { opacity: 1; }
+    100% { transform: translateY(0) scale(1); }
+  }
   .logo-area h1 {
     font-size: 3.4rem;
     font-weight: 900;
-    background: linear-gradient(90deg, #FFEB3B, #FF9800, #F44336);
+    background: linear-gradient(90deg, var(--gold), var(--magenta));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 3px 3px 0 #000;
     letter-spacing: -1px;
     line-height: 1;
+    animation: marquee-in 0.6s cubic-bezier(.2,.8,.2,1) both;
   }
   .tagline {
     display: inline-block;
-    background: var(--yellow);
+    background: linear-gradient(180deg, #FFE9A8, var(--gold));
     color: #000;
     font-weight: 900;
     font-size: 1rem;
     padding: 5px 16px;
     border-radius: 40px;
     border: 3px solid #000;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.2) inset;
     transform: rotate(-2deg);
     margin-top: 6px;
   }
@@ -109,7 +139,7 @@
   .player-num {
     font-size: 3rem;
     font-weight: 900;
-    color: #E65100;
+    color: var(--magenta);
     min-width: 80px;
     text-align: center;
   }
@@ -168,6 +198,8 @@
   }
   
   .big-btn {
+    position: relative;
+    overflow: hidden;
     width: 100%;
     padding: 16px;
     font-size: 1.4rem;
@@ -178,15 +210,23 @@
     box-shadow: 6px 6px 0 #000;
     font-family: inherit;
   }
+  .big-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0) 50%);
+    pointer-events: none;
+  }
   .big-btn:active { transform: translate(3px,3px); box-shadow: 3px 3px 0 #000; }
   .start-btn {
-    background: linear-gradient(90deg, #F44336, #FF9800);
+    background: linear-gradient(90deg, var(--magenta), var(--gold));
     color: white;
     margin-top: 6px;
   }
   .next-btn { background: var(--yellow); color: #000; }
-  .danger-btn { background: #F44336; color: white; }
-  .success-btn { background: #4CAF50; color: white; }
+  .danger-btn { background: var(--red); color: white; }
+  .success-btn { background: var(--green); color: white; }
   
   .header-bar {
     display: flex;
@@ -213,7 +253,7 @@
     box-shadow: 3px 3px 0 #000;
   }
   .player-chip.active { background: var(--yellow); transform: scale(1.05); }
-  .player-chip .pts { color: #E65100; font-weight: 900; }
+  .player-chip .pts { color: var(--magenta); font-weight: 900; }
   
   .question-card {
     background: white;
@@ -244,8 +284,8 @@
     text-shadow: 3px 3px 0 #000;
     margin: 8px 0;
   }
-  .timer.warning { color: #FFEB3B; }
-  .timer.danger { color: #F44336; animation: pulse 0.5s infinite; }
+  .timer.warning { color: var(--gold); }
+  .timer.danger { color: var(--red); animation: pulse 0.5s infinite; }
   @keyframes pulse {
     0%,100% { transform: scale(1); }
     50% { transform: scale(1.08); }
@@ -272,7 +312,7 @@
     height: 48px;
     border-radius: 50%;
     border: 3px solid #000;
-    background: #FFEB3B;
+    background: var(--gold);
     font-size: 1.4rem;
     cursor: pointer;
     box-shadow: 3px 3px 0 #000;
@@ -282,7 +322,7 @@
     justify-content: center;
   }
   .mic-btn.listening {
-    background: #F44336;
+    background: var(--red);
     animation: pulse 0.8s infinite;
   }
   .mic-btn:active {
@@ -347,7 +387,7 @@
   .explain-card h2 {
     font-size: 1.6rem;
     margin-bottom: 12px;
-    color: #E65100;
+    color: var(--magenta);
   }
   .explain-card .how {
     font-size: 1.05rem;
@@ -396,20 +436,24 @@
   .podium .winner {
     font-size: 2.1rem;
     font-weight: 900;
-    color: #E65100;
+    color: var(--magenta);
     margin-bottom: 6px;
   }
   .final-scores { display: grid; gap: 8px; }
   .final-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     background: #E3F2FD;
     border: 3px solid #000;
     border-radius: 12px;
     padding: 11px 14px;
     font-weight: 700;
   }
-  .final-row:first-child { background: var(--yellow); }
+  .final-row .medal { font-size: 1.2rem; margin-left: 8px; }
+  .final-row.rank-1 { background: linear-gradient(180deg, #FFE9A8, var(--gold)); box-shadow: 3px 3px 0 #000; }
+  .final-row.rank-2 { background: linear-gradient(180deg, #F1F3F5, #C9CFD6); }
+  .final-row.rank-3 { background: linear-gradient(180deg, #F0CBA8, #D9A066); }
   
   .footer-note {
     text-align: center;
@@ -436,12 +480,12 @@
     max-width: 240px;
     border-radius: 12px;
     overflow: hidden;
-    border: 8px solid #4CAF50;
+    border: 8px solid var(--green);
     box-shadow: 0 0 0 3px #000;
     background: #eee;
   }
   .img-frame.red {
-    border-color: #F44336;
+    border-color: var(--red);
   }
   .img-frame img {
     display: block;
@@ -477,17 +521,17 @@
   .mini-timer {
     display: inline-block;
     background: #000;
-    color: #FFEB3B;
+    color: var(--gold);
     font-weight: 900;
     font-size: 1.1rem;
     padding: 2px 12px;
     border-radius: 20px;
-    border: 2px solid #FFEB3B;
+    border: 2px solid var(--gold);
     margin-bottom: 6px;
   }
   .mini-timer.danger {
-    color: #F44336;
-    border-color: #F44336;
+    color: var(--red);
+    border-color: var(--red);
     animation: pulse 0.5s infinite;
   }
   .color-label {
@@ -500,19 +544,169 @@
     border: 3px solid #000;
   }
   .color-label.green {
-    background: #4CAF50;
+    background: var(--green);
     color: white;
   }
   .color-label.red {
-    background: #F44336;
+    background: var(--red);
     color: white;
+  }
+  .room-code {
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: 10px;
+    color: var(--magenta);
+    background: #fff;
+    border: 4px solid #000;
+    border-radius: 16px;
+    padding: 8px 18px;
+    display: inline-block;
+    margin: 6px 0;
+  }
+  .lobby-players-empty {
+    text-align: center;
+    color: #999;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  .waiting-note {
+    text-align: center;
+    color: #fff;
+    font-weight: 700;
+    padding: 16px 10px;
   }
 </style>
 </head>
 <body>
 
+<!-- MODE SELECT -->
+<div id="modeSelect" class="screen active">
+  <div class="container">
+    <div class="logo-area">
+      <h1>חרטטן!</h1>
+      <div class="tagline">רק תשובות לא נכונות!</div>
+      <div class="based-on">מבוסס על המשחק והשעשועון חרטטוני<br>של אור בוטבול ועמרי הכהן</div>
+    </div>
+    <div class="card">
+      <div class="section-title">🎮 איך משחקים?</div>
+      <button class="big-btn start-btn" style="margin-bottom:10px" onclick="showScreen('setup')">🖥️ מסך אחד – כולם סביב מכשיר אחד</button>
+      <button class="big-btn next-btn" onclick="enterKahootMode()">📱 קהוט – כל אחד מהטלפון שלו</button>
+    </div>
+    <div class="footer-note">
+      במצב קהוט צריך חיבור לאינטרנט ופרויקט Firebase חינמי מוגדר מראש (הוראות בתחילת קובץ הקוד).
+    </div>
+  </div>
+</div>
+
+<!-- KAHOOT ROLE -->
+<div id="kahootRole" class="screen">
+  <div class="container">
+    <div class="logo-area" style="margin-bottom:14px"><h1 style="font-size:2.3rem">חרטטן!</h1></div>
+    <div class="card">
+      <div class="section-title">📱 מי אתה?</div>
+      <button class="big-btn start-btn" style="margin-bottom:10px" onclick="hostCreateRoom()">🎤 אני המנחה – יצירת חדר</button>
+      <button class="big-btn next-btn" onclick="showScreen('playerJoin')">🙋 אני שחקן – הצטרפות עם קוד</button>
+    </div>
+    <button class="big-btn" style="background:#eee" onclick="showScreen('modeSelect')">← חזרה</button>
+  </div>
+</div>
+
+<!-- HOST LOBBY -->
+<div id="hostLobby" class="screen">
+  <div class="container">
+    <div class="card" style="text-align:center">
+      <div class="section-title" style="justify-content:center">קוד הצטרפות</div>
+      <div class="room-code" id="hostRoomCode">----</div>
+      <div style="font-size:0.85rem;color:#666;margin-top:4px">שחקנים בוחרים "אני שחקן" ומקלידים את הקוד הזה</div>
+    </div>
+    <div class="card">
+      <div class="section-title">👥 שחקנים שהצטרפו (<span id="hostPlayerCount">0</span>)</div>
+      <div class="names-list" id="hostPlayersList" style="max-height:180px"></div>
+    </div>
+    <div class="card">
+      <div class="section-title">🔥 בחר סיבובים</div>
+      <div class="rounds-grid" id="hostRoundsList"></div>
+    </div>
+    <button class="big-btn start-btn" id="hostStartBtn" onclick="hostStartGame()" disabled>יאללה משחקים! ←</button>
+    <div class="footer-note" id="hostStartHint">צריך לפחות 2 שחקנים כדי להתחיל</div>
+  </div>
+</div>
+
+<!-- PLAYER JOIN -->
+<div id="playerJoin" class="screen">
+  <div class="container">
+    <div class="logo-area" style="margin-bottom:14px"><h1 style="font-size:2.3rem">חרטטן!</h1></div>
+    <div class="card">
+      <div class="section-title">🙋 הצטרפות למשחק</div>
+      <div class="name-row" style="margin-bottom:10px">
+        <label>קוד</label>
+        <input type="text" id="joinCodeInput" maxlength="4" placeholder="ABCD" style="text-transform:uppercase;text-align:center;font-weight:900;letter-spacing:4px" autocomplete="off">
+      </div>
+      <div class="name-row">
+        <label>שם</label>
+        <input type="text" id="joinNameInput" maxlength="16" placeholder="השם שלך" autocomplete="off">
+      </div>
+      <button class="big-btn start-btn" style="margin-top:14px" onclick="playerJoinRoom()">הצטרף/י →</button>
+    </div>
+    <button class="big-btn" style="background:#eee" onclick="showScreen('kahootRole')">← חזרה</button>
+  </div>
+</div>
+
+<!-- PLAYER LOBBY -->
+<div id="playerLobby" class="screen">
+  <div class="container">
+    <div class="card" style="text-align:center">
+      <div class="section-title" style="justify-content:center">🙌 מחוברים!</div>
+      <p id="playerLobbyName" style="font-weight:900;font-size:1.3rem;margin-bottom:10px"></p>
+      <p style="color:#666">ממתינים שהמנחה יתחיל את המשחק...</p>
+    </div>
+    <div class="card">
+      <div class="section-title">👥 שחקנים בחדר</div>
+      <div class="names-list" id="playerLobbyList" style="max-height:220px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- KAHOOT GAME (shared reactive screen for host + players) -->
+<div id="kahootGame" class="screen">
+  <div class="container">
+    <div class="header-bar">
+      <div id="kRoundLabel">סיבוב</div>
+      <button onclick="showKScoresModal()" style="background:var(--yellow);border:3px solid #000;border-radius:20px;padding:4px 12px;font-weight:900;font-size:0.85rem;cursor:pointer;box-shadow:2px 2px 0 #000;font-family:inherit">🏆 ניקוד</button>
+      <div id="kRoomCodeBadge" style="color:#fff;font-weight:700;font-size:0.85rem"></div>
+    </div>
+
+    <div id="kExplainBlock" class="explain-card" style="display:none">
+      <h2 id="kExplainTitle"></h2>
+      <ul class="how" id="kExplainText"></ul>
+      <button class="big-btn next-btn" id="kBeginRoundBtn" onclick="hostBeginQuestionPhase()" style="display:none">מתחילים! →</button>
+      <p id="kExplainWaitHint" style="margin-top:10px;color:#666">ממתינים שהמנחה יתחיל...</p>
+    </div>
+
+    <div id="kQuestionBlock" style="display:none">
+      <div class="question-card">
+        <div class="round-name" id="kCurrentRoundName"></div>
+        <div class="q-text" id="kQuestionText">טוען...</div>
+      </div>
+      <div style="text-align:center;margin:4px 0 8px">
+        <span class="mini-timer" id="kTimer" style="display:none">5</span>
+      </div>
+      <div id="kTurnInfo" style="color:white;text-align:center;font-weight:700;margin-bottom:8px"></div>
+      <div id="kActiveControls"></div>
+    </div>
+
+    <div id="kResultBlock" style="display:none"></div>
+
+    <div id="kJudgeBlock" class="judge-area" style="display:none"></div>
+
+    <div id="kNextWrap" style="text-align:center;margin-top:14px;display:none">
+      <button class="big-btn next-btn" onclick="hostNextQuestion()">השאלה הבאה →</button>
+    </div>
+  </div>
+</div>
+
 <!-- SETUP -->
-<div id="setup" class="screen active">
+<div id="setup" class="screen">
   <div class="container">
     <div class="logo-area">
       <h1>חרטטן!</h1>
@@ -545,6 +739,7 @@
       משחק ביתי בהשראת חרטטוני<br>
       האפליקציה פוסלת תשובות קרובות מדי לנכונות
     </div>
+    <button onclick="showScreen('modeSelect')" style="display:block;margin:14px auto 0;background:none;border:none;color:#fff;text-decoration:underline;font-size:0.9rem;cursor:pointer">← חזרה לבחירת מצב משחק</button>
   </div>
 </div>
 
@@ -567,6 +762,7 @@
   <div class="container">
     <div class="header-bar">
       <div id="roundLabel">סיבוב</div>
+      <button onclick="showScoresModal()" style="background:var(--yellow);border:3px solid #000;border-radius:20px;padding:4px 12px;font-weight:900;font-size:0.85rem;cursor:pointer;box-shadow:2px 2px 0 #000;font-family:inherit">🏆 ניקוד</button>
       <div id="qCounter">שאלה 1</div>
     </div>
     
@@ -622,6 +818,48 @@
 </div>
 
 <script>
+/* ============================================================
+   🔥 הגדרות Firebase למצב "קהוט" (משחק מרובה מכשירים)
+   ------------------------------------------------------------
+   מצב "מסך אחד" עובד בלי שום הגדרה. כדי להפעיל גם את מצב
+   "קהוט" (כל שחקן מהטלפון שלו) יש להקים פרויקט Firebase חינמי:
+
+   1. גשו ל-https://console.firebase.google.com ופתחו פרויקט חדש
+      (בחינם, בלי כרטיס אשראי).
+   2. בתפריט הצד: Build ← Realtime Database ← Create Database.
+      בחרו מיקום קרוב (למשל europe-west1), ומצב "Start in test mode".
+   3. אחרי היצירה, לכו ללשונית Rules ותחליפו לכללים האלה (כדי
+      שהגישה לא תיחסם אוטומטית אחרי 30 יום, כמו שקורה במצב הבדיקה):
+        {
+          "rules": {
+            "rooms": { "$code": { ".read": true, ".write": true } }
+          }
+        }
+      (זה נשאר פתוח לכל מי שיש לו את הקוד — מתאים למשחק חברים,
+      לא לאפליקציה ציבורית עם מידע רגיש.)
+   4. בהגדרות הפרויקט (⚙️) ← Project settings ← Your apps ←
+      הוסיפו אפליקציית Web (</>) ← העתיקו את אובייקט
+      firebaseConfig שמופיע שם, והדביקו אותו במקום הערכים למטה.
+   5. שמרו את הקובץ. זהו — מצב "קהוט" יעבוד מכל מכשיר עם אינטרנט.
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBjTi5KHhHM9_3XY06Jj1ZGweldqLOcc84",
+  authDomain: "gen-lang-client-0016031123.firebaseapp.com",
+  databaseURL: "https://gen-lang-client-0016031123-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "gen-lang-client-0016031123",
+};
+let fb = null;
+let fbReady = false;
+try {
+  if (firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('PASTE_')) {
+    firebase.initializeApp(firebaseConfig);
+    fb = firebase.database();
+    fbReady = true;
+  }
+} catch (e) {
+  console.error('Firebase init failed:', e);
+}
+
 // ========== DATA ==========
 const ROUNDS = [
   {
@@ -631,6 +869,7 @@ const ROUNDS = [
     explain: [
       'המנחה שואל שאלות במהירות.',
       'השחקן מקליד תשובה <strong>שגויה</strong> שעדיין קשורה לנושא.',
+      'יש לכם {TIME} שניות לענות על כל שאלה.',
       'האפליקציה בודקת אוטומטית אם התשובה קרובה מדי לנכונה → פוסלת.',
       'אם היא שונה מספיק → מקבלים נקודה.',
       'כל תשובה מוצלחת = 1 נקודה.'
@@ -644,6 +883,7 @@ const ROUNDS = [
     shortDesc: 'תשובה מוצלחת מזכה',
     explain: [
       'כל שחקן מקליד תשובה שגויה לשאלה.',
+      'יש {TIME} שניות לכל תשובה.',
       'האפליקציה פוסלת אוטומטית תשובות שקרובות מדי לנכונה.',
       'תשובה שונה מספיק = נקודה.',
       'מי עם יותר נקודות בסוף מוביל.'
@@ -654,10 +894,10 @@ const ROUNDS = [
   {
     id: 'dynamite',
     name: '💣 סיבוב הדינמיט',
-    shortDesc: '5 שניות – אחרת מפסידים נקודות',
+    shortDesc: '{TIME} שניות – אחרת מפסידים נקודות',
     explain: [
       'שאלה אחת עוברת בין השחקנים.',
-      'כל אחד חייב להקליד תשובה שגויה תוך 5 שניות.',
+      'כל אחד חייב להקליד תשובה שגויה תוך {TIME} שניות.',
       'האפליקציה בודקת אוטומטית.',
       'כישלון או איחור = הפסד של 2 נקודות.'
     ],
@@ -673,6 +913,7 @@ const ROUNDS = [
       'מוצגת <strong>תמונה אמיתית</strong> עם מסגרת ירוקה או אדומה.',
       '<strong>מסגרת ירוקה</strong> = רק תשובה נכונה.',
       '<strong>מסגרת אדומה</strong> = רק תשובה שגויה (מחורטטת).',
+      'יש לכם {TIME} שניות לענות.',
       'אין שאלה כתובה – רק התמונה והמסגרת.'
     ],
     time: 14,
@@ -714,7 +955,18 @@ const QUESTIONS = {
     { text: "כמה אצבעות יש ביד אחת?", correct: ["5", "חמש"] },
     { text: "איפה שמים את המפתחות בדרך כלל?", correct: ["בכיס", "בתיק", "בתלייה", "במגירה"] },
     { text: "מה הצבע של דגל יפן?", correct: ["לבן ואדום", "אדום ולבן", "לבן עם עיגול אדום"] },
-    { text: "איזה בעל חיים הכי מהיר ביבשה?", correct: ["ציטה", "צ'יטה", "ברדלס"] }
+    { text: "איזה בעל חיים הכי מהיר ביבשה?", correct: ["ציטה", "צ'יטה", "ברדלס"] },
+    { text: "מה צריך כדי לאפות עוגה?", correct: ["תנור", "לחמם תנור", "מתכון"] },
+    { text: "איזה כלי משתמשים בו לחיתוך נייר?", correct: ["מספריים"] },
+    { text: "מה עושים עם מפתח?", correct: ["פותחים דלת", "נועלים דלת", "פתיחה ונעילה"] },
+    { text: "איזה חודש הוא הראשון בשנה?", correct: ["ינואר"] },
+    { text: "מה הצבע של עגבנייה בשלה?", correct: ["אדום", "אדומה"] },
+    { text: "כמה גלגלים יש לאופנוע?", correct: ["2", "שתיים", "שניים"] },
+    { text: "איזה עוף לא יכול לעוף?", correct: ["יען", "פינגווין", "תרנגול הודו"] },
+    { text: "מה עושה נגר?", correct: ["עובד עם עץ", "בונה רהיטים", "עבודות עץ"] },
+    { text: "איזה כוכב לכת הכי קרוב לשמש?", correct: ["כוכב חמה", "מרקורי"] },
+    { text: "מה שמים על פיצה בדרך כלל?", correct: ["גבינה", "רוטב עגבניות", "זיתים"] },
+    { text: "איזה בעל חיים נותן לנו צמר?", correct: ["כבשה", "כבש", "כבשים"] }
   ],
   head: [
     { text: "מה הדבר הכי חם בעולם?", correct: ["שמש", "השמש", "ליבת כדור הארץ", "לבה"] },
@@ -726,7 +978,17 @@ const QUESTIONS = {
     { text: "מה המרכיב העיקרי בלחם?", correct: ["קמח", "מים", "שמרים"] },
     { text: "איך קוראים לתינוק של הפרה?", correct: ["עגל", "עגלה"] },
     { text: "מה עושה חקלאי?", correct: ["מגדל יבולים", "עובד בשדה", "חקלאות"] },
-    { text: "איזה פרי גדל על עץ תפוח?", correct: ["תפוח", "תפוחים"] }
+    { text: "איזה פרי גדל על עץ תפוח?", correct: ["תפוח", "תפוחים"] },
+    { text: "מה עושה גנן?", correct: ["מטפל בגינה", "מגדל צמחים", "גינון"] },
+    { text: "כמה עונות יש בשנה?", correct: ["4", "ארבע", "ארבעה"] },
+    { text: "איזה חלק בגוף משמש לראייה?", correct: ["עיניים", "עין"] },
+    { text: "מה עושים במכבסה?", correct: ["מכבסים בגדים", "כביסה", "מכבסים"] },
+    { text: "איזו בהמה נותנת לנו חלב?", correct: ["פרה", "פרות", "עז", "כבשה"] },
+    { text: "מה הצבע של דם?", correct: ["אדום"] },
+    { text: "איך קוראים למי שמטיס מטוס?", correct: ["טייס", "טייסת"] },
+    { text: "מה עושים עם מחט וחוט?", correct: ["תופרים", "תפירה"] },
+    { text: "איזה כלי רכב נוסע על מסילה?", correct: ["רכבת"] },
+    { text: "מה קורה לקרח כשמחממים אותו?", correct: ["נמס", "הופך למים"] }
   ],
   dynamite: [
     { text: "מה עושים עם מטרייה?", correct: ["מתגוננים מגשם", "הגנה מגשם", "פותחים בגשם"] },
@@ -736,7 +998,15 @@ const QUESTIONS = {
     { text: "איזה יום הוא היום הראשון בשבוע בישראל?", correct: ["ראשון", "יום ראשון"] },
     { text: "מה עושה טבח במסעדה?", correct: ["מבשל", "מכין אוכל", "בישול"] },
     { text: "איפה שמים את הכסף בארנק?", correct: ["בארנק", "בכיס"] },
-    { text: "מה הצבע של בננה בשלה?", correct: ["צהוב"] }
+    { text: "מה הצבע של בננה בשלה?", correct: ["צהוב"] },
+    { text: "מה עושים עם מברשת שיער?", correct: ["מסרקים שיער", "מברישים שיער"] },
+    { text: "איזה כלי נותן אור בלילה?", correct: ["מנורה", "פנס"] },
+    { text: "מה קורה כשלא ישנים מספיק?", correct: ["עייפים", "עייפות"] },
+    { text: "איזה חג חוגגים בסוכה?", correct: ["סוכות"] },
+    { text: "מה עושים במספרה?", correct: ["מסתפרים", "תספורת"] },
+    { text: "איזו עונה הכי קרה בשנה?", correct: ["חורף"] },
+    { text: "מה שמים ברגליים כשקר?", correct: ["גרביים", "נעליים", "מגפיים"] },
+    { text: "איזה כלי שומר על האוכל קר?", correct: ["מקרר"] }
   ],
   tmonot: [
     { text: "בננה", correct: ["בננה", "בננות", "צהוב", "צהובה", "בננה צהובה", "בננות צהובות", "banana", "bananas"], mode: "true",
@@ -762,14 +1032,31 @@ const QUESTIONS = {
     { text: "עץ", correct: ["עץ", "עצים", "tree", "trees"], mode: "fake",
       img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=400&h=300&q=80" },
     { text: "בית", correct: ["בית", "בתים", "house", "home"], mode: "fake",
-      img: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=400&h=300&q=80" }
+      img: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "אופניים", correct: ["אופניים", "אופניים", "bike", "bicycle"], mode: "true",
+      img: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "שעון", correct: ["שעון", "שעונים", "watch", "clock"], mode: "true",
+      img: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "גיטרה", correct: ["גיטרה", "גיטרות", "guitar"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "עוגה", correct: ["עוגה", "עוגות", "cake"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "מחשב נייד", correct: ["מחשב", "מחשב נייד", "לפטופ", "laptop", "computer"], mode: "true",
+      img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "מטרייה", correct: ["מטרייה", "מטריות", "umbrella"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?auto=format&fit=crop&w=400&h=300&q=80" }
   ],
   verified: [
     { text: "ספר שני דברים על עצמך – אחד אמיתי ואחד מומצא. השני מנחש.", correct: [], manual: true },
     { text: "תאר חוויה מהשבוע – האם היא אמיתית או מומצאת?", correct: [], manual: true },
     { text: "מה התחביב הכי מוזר שלך? (אמיתי או מומצא)", correct: [], manual: true },
     { text: "ספר על המקום הכי רחוק שהיית בו – האם זה אמיתי?", correct: [], manual: true },
-    { text: "מה הדבר הכי מביך שקרה לך? אמיתי או מומצא?", correct: [], manual: true }
+    { text: "מה הדבר הכי מביך שקרה לך? אמיתי או מומצא?", correct: [], manual: true },
+    { text: "ספר על חלום מוזר שחלמת – אמיתי או מומצא?", correct: [], manual: true },
+    { text: "מה הדבר הכי אמיץ שעשית? (אמיתי או מומצא)", correct: [], manual: true },
+    { text: "ספר על מפגש מקרי עם מפורסם/ת – אמיתי או מומצא?", correct: [], manual: true },
+    { text: "מה הכישרון הנסתר שלך? אמיתי או מומצא?", correct: [], manual: true },
+    { text: "ספר על תקלה מביכה במקום העבודה – אמיתית או מומצאת?", correct: [], manual: true }
   ]
 };
 
@@ -786,6 +1073,17 @@ let timeLeft = 0;
 let roundQueue = [];
 let roundQueueIndex = 0;
 let currentIsGreen = true;
+let verifiedMode = false;
+let verifiedGuesserIndex = 0;
+
+// ---- Kahoot multiplayer state ----
+const PLACEHOLDER_IMG = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWVlZWVlIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+16rXnteV16DXlCDXnNeQINeg15jXoteg15Q8L3RleHQ+PC9zdmc+';
+let myDeviceId = null;
+let myRoomCode = null;
+let isHostDevice = false;
+let roomState = null;
+let kProcessingLock = false;
+let kTimerInterval = null;
 
 // ========== HELPERS ==========
 function normalize(str) {
@@ -797,18 +1095,47 @@ function normalize(str) {
     .replace(/\s+/g, " ");
 }
 
+function wordsOf(str) {
+  return normalize(str).split(" ").filter(Boolean);
+}
+
+// Returns the set of accepted spellings for a single word: itself, plus
+// common Hebrew plural/gender suffix add/strip variants (בלון/בלונים, ילד/ילדה...).
+function suffixVariants(word) {
+  const variants = new Set([word]);
+  const suffixes = ["ות", "ים", "ה", "ן"];
+  suffixes.forEach(suf => {
+    if (word.length > suf.length && word.endsWith(suf)) variants.add(word.slice(0, -suf.length));
+    variants.add(word + suf);
+  });
+  return variants;
+}
+
+// Whole-word phrase containment: true if `needle` appears as a contiguous
+// run of whole words inside `haystack` (not a raw character substring —
+// so "40" no longer matches "4", "ספר" no longer matches "ספרים" by accident).
+function containsPhrase(haystackWords, needleWords) {
+  if (needleWords.length === 0 || haystackWords.length < needleWords.length) return false;
+  for (let i = 0; i <= haystackWords.length - needleWords.length; i++) {
+    let match = true;
+    for (let j = 0; j < needleWords.length; j++) {
+      if (!suffixVariants(needleWords[j]).has(haystackWords[i + j])) { match = false; break; }
+    }
+    if (match) return true;
+  }
+  return false;
+}
+
 function isTooCloseToCorrect(answer, correctList) {
   if (!correctList || correctList.length === 0) return false;
-  const a = normalize(answer);
-  if (!a) return true;
-  
+  const answerWords = wordsOf(answer);
+  if (answerWords.length === 0) return true;
+
   for (const c of correctList) {
-    const corr = normalize(c);
-    if (!corr) continue;
-    if (a === corr || a.includes(corr) || corr.includes(a)) return true;
-    // also accept if one is the other + common plural suffix
-    if (a === corr + "ות" || a === corr + "ים" || a === corr + "ה" || 
-        corr === a + "ות" || corr === a + "ים" || corr === a + "ה") return true;
+    const correctWords = wordsOf(c);
+    if (correctWords.length === 0) continue;
+    if (containsPhrase(answerWords, correctWords)) return true;
+    if (containsPhrase(correctWords, answerWords)) return true;
   }
   return false;
 }
@@ -839,13 +1166,14 @@ function renderNameInputs() {
   }
 }
 
-function renderRounds() {
-  const list = document.getElementById('roundsList');
+function renderRounds(containerId) {
+  const list = document.getElementById(containerId || 'roundsList');
+  if (!list) return;
   list.innerHTML = '';
   ROUNDS.forEach(r => {
     const div = document.createElement('div');
     div.className = 'round-btn' + (selectedRounds.includes(r.id) ? ' selected' : '');
-    div.innerHTML = `${r.name}<div class="desc">${r.shortDesc}</div>`;
+    div.innerHTML = `${r.name}<div class="desc">${r.shortDesc.replace(/\{TIME\}/g, r.time)}</div>`;
     div.onclick = () => toggleRound(r.id, div);
     list.appendChild(div);
   });
@@ -886,7 +1214,9 @@ function showExplainForCurrentRound() {
   const round = ROUNDS.find(r => r.id === currentRoundId);
   
   document.getElementById('explainTitle').textContent = round.name;
-  document.getElementById('explainText').innerHTML = round.explain.map(l => `<li>${l}</li>`).join('');
+  document.getElementById('explainText').innerHTML = round.explain
+    .map(l => `<li>${l.replace(/\{TIME\}/g, round.time)}</li>`)
+    .join('');
   
   document.getElementById('explain').classList.add('active');
   document.getElementById('game').classList.remove('active');
@@ -936,7 +1266,7 @@ function showQuestion() {
     const imgSrc = q.img || '';
     document.getElementById('questionText').innerHTML = `
       <div class="${frameClass}">
-        <img src="${imgSrc}" alt="תמונה" onerror="this.src='https://via.placeholder.com/400x300?text=תמונה'">
+        <img src="${imgSrc}" alt="תמונה" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
       </div>
     `;
   } else {
@@ -981,7 +1311,7 @@ function showQuestion() {
           if (btn) btn.style.display = this.value.trim() ? 'block' : 'none';
         });
       }
-      setupSpeechRecognition();
+      setupSpeechRecognition('answerInput', 'micBtn', 'sendBtn', submitAnswer);
     }, 60);
     
     startTimer(round.time, () => {
@@ -1014,6 +1344,7 @@ function startTimer(seconds, onEnd) {
       inline.textContent = timeLeft;
       inline.className = timeLeft <= 3 ? 'mini-timer danger' : 'mini-timer';
     }
+    if (timeLeft > 0 && timeLeft <= 3 && navigator.vibrate) navigator.vibrate(60);
   }
   updateDisplays();
   
@@ -1024,6 +1355,7 @@ function startTimer(seconds, onEnd) {
       clearInterval(timerInterval);
       const inline = document.getElementById('inlineTimer');
       if (inline) inline.style.display = 'none';
+      if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
       if (onEnd) onEnd();
     }
   }, 1000);
@@ -1068,6 +1400,8 @@ function submitAnswer(isTimeout = false) {
   
   if (success) {
     players[currentPlayerIndex].score += round.points;
+  } else if (currentRoundId === 'dynamite') {
+    players[currentPlayerIndex].score = Math.max(0, players[currentPlayerIndex].score - (round.penalty || 2));
   }
   
   showAutoResult(success, message);
@@ -1076,11 +1410,20 @@ function submitAnswer(isTimeout = false) {
 
 function showAutoResult(success, message) {
   const area = document.getElementById('resultArea');
+  const round = ROUNDS.find(r => r.id === currentRoundId);
+  let detail;
+  if (success) {
+    detail = `+${round.points} נקודות`;
+  } else if (currentRoundId === 'dynamite') {
+    detail = `−${round.penalty || 2} נקודות`;
+  } else {
+    detail = 'לא נוספו נקודות';
+  }
   area.style.display = 'block';
   area.innerHTML = `
     <div class="result-banner ${success ? 'success' : 'fail'}">
       ${success ? '✅ ' + message : '❌ ' + message}
-      <div class="detail">${success ? `+${ROUNDS.find(r=>r.id===currentRoundId).points} נקודות` : 'לא נוספו נקודות'}</div>
+      <div class="detail">${detail}</div>
     </div>
     <button class="big-btn next-btn" onclick="nextQuestion()">השאלה הבאה →</button>
     <div style="margin-top:10px;text-align:center">
@@ -1098,9 +1441,26 @@ function showManualJudge() {
 
 function manualAward(success) {
   const round = ROUNDS.find(r => r.id === currentRoundId);
-  if (success) {
+
+  if (verifiedMode) {
+    // In "מאומת או מחורטט", `success` means "the guess was correct".
+    // A correct guess rewards the guesser; a fooled guesser rewards the storyteller.
+    const guesser = players[verifiedGuesserIndex];
+    const teller = players[currentPlayerIndex];
+    if (success) {
+      guesser.score += round.points;
+      showModal('✅ ניחוש נכון!', `${guesser.name} מקבל/ת ${round.points} נקודות`);
+    } else {
+      teller.score += round.points;
+      showModal('🎭 חרטוט מוצלח!', `${teller.name} הצליח/ה לרמות ומקבל/ת ${round.points} נקודות`);
+    }
+    verifiedMode = false;
+  } else if (success) {
     players[currentPlayerIndex].score += round.points;
     showModal('✅ התקבל ידנית', `+${round.points} נקודות`);
+  } else if (currentRoundId === 'dynamite') {
+    players[currentPlayerIndex].score = Math.max(0, players[currentPlayerIndex].score - (round.penalty || 2));
+    showModal('❌ נפסל ידנית', `−${round.penalty || 2} נקודות`);
   } else {
     showModal('❌ נפסל ידנית', 'לא נוספו נקודות');
   }
@@ -1112,9 +1472,12 @@ function manualAward(success) {
 function guessVerified(saidVerified) {
   clearInterval(timerInterval);
   document.getElementById('timerDisplay').style.display = 'none';
+  verifiedMode = true;
+  verifiedGuesserIndex = (currentPlayerIndex + 1) % players.length;
+  const guesserName = players[verifiedGuesserIndex].name;
   document.getElementById('gameActions').innerHTML = `
     <p style="color:white;text-align:center;margin-bottom:12px">
-      ניחש: <strong>${saidVerified ? 'מאומת' : 'מחורטט'}</strong><br>
+      ${guesserName} ניחש/ה: <strong>${saidVerified ? 'מאומת' : 'מחורטט'}</strong><br>
       המנחה – האם הניחוש נכון?
     </p>
   `;
@@ -1133,26 +1496,35 @@ function nextQuestion() {
 }
 
 function endGame() {
-  document.getElementById('game').classList.remove('active');
-  document.getElementById('explain').classList.remove('active');
-  document.getElementById('results').classList.add('active');
-  
-  const sorted = [...players].sort((a,b) => b.score - a.score);
-  document.getElementById('winnerName').textContent = sorted[0].name;
-  
+  showFinalResults(players);
+}
+
+function showFinalResults(playersArr) {
+  showScreen('results');
+  const sorted = [...playersArr].sort((a, b) => b.score - a.score);
+  document.getElementById('winnerName').textContent = sorted[0] ? sorted[0].name : '';
+
   const list = document.getElementById('finalScores');
   list.innerHTML = '';
+  const medals = ['🥇', '🥈', '🥉'];
   sorted.forEach((p, i) => {
     const row = document.createElement('div');
-    row.className = 'final-row';
-    row.innerHTML = `<span>${i+1}. ${p.name}</span><span>${p.score} נק׳</span>`;
+    row.className = 'final-row' + (i < 3 ? ` rank-${i + 1}` : '');
+    const medal = medals[i] ? `<span class="medal">${medals[i]}</span>` : '';
+    row.innerHTML = `<span>${medal}${i + 1}. ${p.name}</span><span>${p.score} נק׳</span>`;
     list.appendChild(row);
   });
 }
 
+function showScoresModal() {
+  const sorted = [...players].sort((a, b) => b.score - a.score);
+  const rows = sorted.map((p, i) => `${i + 1}. ${p.name} — ${p.score} נק׳`).join('<br>');
+  showModal('📊 ניקוד נוכחי', rows);
+}
+
 function showModal(title, text) {
   document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalText').textContent = text;
+  document.getElementById('modalText').innerHTML = text;
   document.getElementById('modal').style.display = 'flex';
 }
 function closeModal() {
@@ -1164,54 +1536,75 @@ function closeModal() {
 let recognition = null;
 let isListening = false;
 
-function setupSpeechRecognition() {
-  const micBtn = document.getElementById('micBtn');
-  if (!micBtn) return;
+function setupSpeechRecognition(inputId, micId, sendId, onSubmit) {
+  const micBtn = document.getElementById(micId);
+  const inp = document.getElementById(inputId);
+  if (!micBtn || !inp) return;
+
+  const defaultPlaceholder = inp.placeholder;
+
+  // Enter submits the typed/spoken answer immediately.
+  inp.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && inp.value.trim()) {
+      e.preventDefault();
+      onSubmit();
+    }
+  });
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     micBtn.style.opacity = '0.4';
     micBtn.title = 'הכרה קולית לא נתמכת בדפדפן זה';
-    micBtn.onclick = () => alert('הכרה קולית לא נתמכת בדפדפן הזה.\nנסה Chrome במובייל או במחשב.');
+    micBtn.onclick = () => showModal('🎤 לא נתמך', 'הכרה קולית לא נתמכת בדפדפן הזה.<br>אפשר להמשיך ולהקליד את התשובה, או לנסות ב-Chrome.');
     return;
   }
 
   recognition = new SpeechRecognition();
   recognition.lang = 'he-IL';
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 3;
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
   recognition.continuous = false;
 
   recognition.onstart = () => {
     isListening = true;
     micBtn.classList.add('listening');
     micBtn.textContent = '🔴';
+    inp.placeholder = 'מקשיב... דברו עכשיו';
   };
 
   recognition.onend = () => {
     isListening = false;
     micBtn.classList.remove('listening');
     micBtn.textContent = '🎤';
+    inp.placeholder = defaultPlaceholder;
   };
 
   recognition.onerror = (e) => {
     isListening = false;
     micBtn.classList.remove('listening');
     micBtn.textContent = '🎤';
-    if (e.error === 'not-allowed') {
-      alert('יש לאפשר גישה למיקרופון בהגדרות הדפדפן');
-    }
+    inp.placeholder = defaultPlaceholder;
+    const messages = {
+      'not-allowed': 'יש לאפשר גישה למיקרופון בהגדרות הדפדפן.',
+      'audio-capture': 'לא נמצא מיקרופון פעיל במכשיר.',
+      'network': 'בעיית רשת בזיהוי הקולי – נסו שוב.'
+      // 'no-speech' and 'aborted' are silent — not worth interrupting the round for.
+    };
+    const msg = messages[e.error];
+    if (msg) showModal('🎤 בעיה בזיהוי קולי', msg);
   };
 
   recognition.onresult = (event) => {
-    const result = event.results[0][0].transcript;
-    const inp = document.getElementById('answerInput');
-    if (inp) {
-      inp.value = result.trim();
-      const btn = document.getElementById('sendBtn');
-      if (btn) btn.style.display = inp.value.trim() ? 'block' : 'none';
-      // auto-submit after short delay? better let user confirm
+    let finalTranscript = '';
+    let interimTranscript = '';
+    for (let i = 0; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalTranscript += transcript;
+      else interimTranscript += transcript;
     }
+    inp.value = (finalTranscript || interimTranscript).trim();
+    const btn = document.getElementById(sendId);
+    if (btn) btn.style.display = inp.value.trim() ? 'block' : 'none';
   };
 
   micBtn.onclick = () => {
@@ -1219,6 +1612,9 @@ function setupSpeechRecognition() {
       recognition.stop();
       return;
     }
+    inp.value = '';
+    const btn = document.getElementById(sendId);
+    if (btn) btn.style.display = 'none';
     try {
       recognition.start();
     } catch (err) {
@@ -1228,9 +1624,448 @@ function setupSpeechRecognition() {
 }
 
 
+// ========== KAHOOT MULTIPLAYER MODE ==========
+
+function getDeviceId() {
+  let id = localStorage.getItem('hartetuni_device_id');
+  if (!id) {
+    id = 'p' + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem('hartetuni_device_id', id);
+  }
+  return id;
+}
+
+function generateRoomCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O or 1/I mix-ups
+  let code = '';
+  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function enterKahootMode() {
+  if (!fbReady) {
+    showModal('🔥 צריך להגדיר Firebase', 'כדי לשחק במצב קהוט (כל שחקן מהטלפון שלו) צריך קודם לחבר פרויקט Firebase חינמי. ההוראות המלאות נמצאות בתחילת קובץ הקוד (חפשו "הגדרות Firebase"). אחרי ההגדרה שמרו את הקובץ מחדש.');
+    return;
+  }
+  showScreen('kahootRole');
+}
+
+// ---- Host: create & run the room ----
+function hostCreateRoom() {
+  myDeviceId = getDeviceId();
+  myRoomCode = generateRoomCode();
+  isHostDevice = true;
+  fb.ref('rooms/' + myRoomCode).set({
+    createdAt: firebase.database.ServerValue.TIMESTAMP,
+    hostId: myDeviceId,
+    selectedRounds: selectedRounds.slice(),
+    players: {},
+    order: [],
+    state: { phase: 'lobby' }
+  }).then(() => {
+    document.getElementById('hostRoomCode').textContent = myRoomCode;
+    renderRounds('hostRoundsList');
+    listenToRoom(myRoomCode);
+    showScreen('hostLobby');
+  }).catch(err => {
+    showModal('❌ שגיאה ביצירת חדר', 'בדקו את פרטי ה-Firebase (databaseURL, הרשאות) ונסו שוב.<br>' + err.message);
+  });
+}
+
+function renderHostLobby(room) {
+  const players = room.players || {};
+  const ids = Object.keys(players);
+  document.getElementById('hostPlayerCount').textContent = ids.length;
+  const list = document.getElementById('hostPlayersList');
+  list.innerHTML = ids.length
+    ? ids.map(id => `<div class="name-row"><span style="font-weight:700">🙋 ${players[id].name}</span></div>`).join('')
+    : '<div class="lobby-players-empty">מחכים לשחקנים ראשונים...</div>';
+  const startBtn = document.getElementById('hostStartBtn');
+  startBtn.disabled = ids.length < 2;
+  document.getElementById('hostStartHint').style.display = ids.length < 2 ? 'block' : 'none';
+}
+
+function hostStartGame() {
+  const ids = Object.keys((roomState && roomState.players) || {});
+  if (ids.length < 2) return;
+  ids.sort((a, b) => (roomState.players[a].joinedAt || 0) - (roomState.players[b].joinedAt || 0));
+  fb.ref('rooms/' + myRoomCode).update({
+    order: ids,
+    selectedRounds: selectedRounds.slice(),
+    state: {
+      phase: 'explain',
+      roundQueueIndex: 0,
+      roundId: selectedRounds[0],
+      currentPlayerIdx: 0
+    }
+  });
+}
+
+// ---- Player: join the room ----
+function playerJoinRoom() {
+  const code = (document.getElementById('joinCodeInput').value || '').trim().toUpperCase();
+  const name = (document.getElementById('joinNameInput').value || '').trim() || 'שחקן';
+  if (code.length < 4) {
+    showModal('❌ קוד חסר', 'הקלידו את קוד הארבע התווים שקיבלתם מהמנחה.');
+    return;
+  }
+  myDeviceId = getDeviceId();
+  isHostDevice = false;
+  fb.ref('rooms/' + code).once('value').then(snap => {
+    if (!snap.exists()) {
+      showModal('❌ קוד לא נמצא', 'בדקו את הקוד עם המנחה ונסו שוב.');
+      return;
+    }
+    myRoomCode = code;
+    return fb.ref(`rooms/${code}/players/${myDeviceId}`).set({
+      name, score: 0, joinedAt: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      document.getElementById('playerLobbyName').textContent = `שלום, ${name}!`;
+      listenToRoom(code);
+      showScreen('playerLobby');
+    });
+  }).catch(() => {
+    showModal('❌ שגיאה', 'לא הצלחנו להתחבר. בדקו חיבור לאינטרנט ונסו שוב.');
+  });
+}
+
+function renderPlayerLobbyList(room) {
+  const players = room.players || {};
+  const rows = Object.values(players).map(p => `<div class="name-row"><span style="font-weight:700">🙋 ${p.name}</span></div>`).join('');
+  document.getElementById('playerLobbyList').innerHTML = rows || '<div class="lobby-players-empty">רק אתם כרגע...</div>';
+}
+
+// ---- Shared reactive listener ----
+function listenToRoom(code) {
+  fb.ref('rooms/' + code).on('value', snap => {
+    const room = snap.val();
+    if (!room) return;
+    roomState = room;
+    onRoomUpdate(room);
+  });
+}
+
+function onRoomUpdate(room) {
+  const phase = room.state && room.state.phase;
+
+  if (phase === 'lobby') {
+    if (isHostDevice) renderHostLobby(room);
+    else renderPlayerLobbyList(room);
+    return;
+  }
+
+  showScreen('kahootGame');
+  document.getElementById('kRoomCodeBadge').textContent = 'קוד: ' + myRoomCode;
+
+  if (phase === 'explain') renderKExplain(room);
+  else if (phase === 'question') renderKQuestion(room);
+  else if (phase === 'storyJudge') renderKStoryJudge(room);
+  else if (phase === 'result') renderKResult(room);
+  else if (phase === 'finished') renderKFinished(room);
+
+  // Only the host mutates scores/phase, so there's a single writer resolving
+  // whatever a player device just queued (an answer, a guess, a judgment).
+  if (isHostDevice) processPendingAction(room);
+}
+
+function renderKExplain(room) {
+  const round = ROUNDS.find(r => r.id === room.state.roundId);
+  document.getElementById('kExplainBlock').style.display = 'block';
+  document.getElementById('kQuestionBlock').style.display = 'none';
+  document.getElementById('kResultBlock').style.display = 'none';
+  document.getElementById('kJudgeBlock').style.display = 'none';
+  document.getElementById('kNextWrap').style.display = 'none';
+  document.getElementById('kRoundLabel').textContent = round.name;
+  document.getElementById('kExplainTitle').textContent = round.name;
+  document.getElementById('kExplainText').innerHTML = round.explain
+    .map(l => `<li>${l.replace(/\{TIME\}/g, round.time)}</li>`).join('');
+  document.getElementById('kBeginRoundBtn').style.display = isHostDevice ? 'block' : 'none';
+  document.getElementById('kExplainWaitHint').style.display = isHostDevice ? 'none' : 'block';
+}
+
+function hostBeginQuestionPhase() {
+  const room = roomState;
+  const roundId = room.state.roundId;
+  const qs = QUESTIONS[roundId] || [];
+  const order = room.order || [];
+  const take = Math.min(qs.length, Math.max(4, Math.min(7, order.length + 2)));
+  const indices = qs.map((_, i) => i).sort(() => Math.random() - 0.5).slice(0, take);
+  startKQuestion(roundId, indices, 0, room.state.currentPlayerIdx || 0);
+}
+
+function startKQuestion(roundId, questionOrder, questionIndex, currentPlayerIdx) {
+  const round = ROUNDS.find(r => r.id === roundId);
+  const order = roomState.order || [];
+  const activePlayerId = order[currentPlayerIdx % order.length];
+  fb.ref('rooms/' + myRoomCode + '/state').update({
+    phase: 'question',
+    roundId: roundId,
+    questionOrder: questionOrder,
+    questionIndex: questionIndex,
+    currentPlayerIdx: currentPlayerIdx,
+    activePlayerId: activePlayerId,
+    guesserPlayerId: roundId === 'verified' ? order[(currentPlayerIdx + 1) % order.length] : null,
+    pendingAction: null,
+    pendingGuess: null,
+    lastResult: null,
+    timerEndsAt: (round.manual || roundId === 'verified') ? null : (Date.now() + round.time * 1000)
+  });
+}
+
+function renderKQuestion(room) {
+  const round = ROUNDS.find(r => r.id === room.state.roundId);
+  const q = QUESTIONS[room.state.roundId][room.state.questionOrder[room.state.questionIndex]];
+  const activeId = room.state.activePlayerId;
+  const activeName = (room.players[activeId] || {}).name || '?';
+  const amActive = myDeviceId === activeId;
+
+  document.getElementById('kExplainBlock').style.display = 'none';
+  document.getElementById('kQuestionBlock').style.display = 'block';
+  document.getElementById('kResultBlock').style.display = 'none';
+  document.getElementById('kJudgeBlock').style.display = 'none';
+  document.getElementById('kNextWrap').style.display = 'none';
+  document.getElementById('kRoundLabel').textContent = round.name;
+  document.getElementById('kCurrentRoundName').textContent = round.id === 'tmonot' ? '' : round.name;
+
+  if (round.id === 'tmonot') {
+    const isGreen = q.mode === 'true';
+    document.getElementById('kQuestionText').innerHTML = `
+      <div class="${isGreen ? 'img-frame' : 'img-frame red'}">
+        <img src="${q.img}" alt="תמונה" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}'">
+      </div>
+      <div class="color-label ${isGreen ? 'green' : 'red'}">${isGreen ? 'ירוק – רק אמת' : 'אדום – רק חרטוט'}</div>`;
+  } else {
+    document.getElementById('kQuestionText').textContent = q.text;
+  }
+
+  const timerEl = document.getElementById('kTimer');
+  clearInterval(kTimerInterval);
+  if (room.state.timerEndsAt) {
+    timerEl.style.display = 'inline-block';
+    const endsAt = room.state.timerEndsAt;
+    const tick = () => {
+      const left = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+      timerEl.textContent = left;
+      timerEl.className = left <= 3 ? 'mini-timer danger' : 'mini-timer';
+      if (left <= 0) {
+        clearInterval(kTimerInterval);
+        if (isHostDevice) hostHandleTimeout();
+      }
+    };
+    tick();
+    kTimerInterval = setInterval(tick, 250);
+  } else {
+    timerEl.style.display = 'none';
+  }
+
+  const turnInfo = document.getElementById('kTurnInfo');
+  const controls = document.getElementById('kActiveControls');
+
+  if (round.id === 'verified') {
+    const guesserName = (room.players[room.state.guesserPlayerId] || {}).name || '?';
+    if (amActive) {
+      turnInfo.textContent = `התור שלך לספר! ${guesserName} ינחש/תנחש`;
+      controls.innerHTML = `<p style="color:white;text-align:center">ספר/י בקול שני דברים על עצמך – אחד אמיתי ואחד מומצא.</p>`;
+    } else if (myDeviceId === room.state.guesserPlayerId) {
+      turnInfo.textContent = `${activeName} מספר/ת עכשיו – מה דעתך?`;
+      controls.innerHTML = `
+        <div class="action-row">
+          <button class="big-btn success-btn" onclick="playerAction('guess',{guess:true})">מאומת</button>
+          <button class="big-btn danger-btn" onclick="playerAction('guess',{guess:false})">מחורטט</button>
+        </div>`;
+    } else {
+      turnInfo.textContent = `${activeName} מספר/ת ל-${guesserName}...`;
+      controls.innerHTML = '<div class="waiting-note">🎧 מקשיבים...</div>';
+    }
+    return;
+  }
+
+  if (amActive) {
+    turnInfo.textContent = '🎯 התור שלך!';
+    controls.innerHTML = `
+      <div class="answer-box">
+        <input type="text" id="kAnswerInput" placeholder="הקלד או לחץ על המיקרופון..." autocomplete="off" enterkeyhint="done">
+        <button class="mic-btn" id="kMicBtn" type="button" title="הכרה קולית">🎤</button>
+      </div>
+      <button class="big-btn next-btn" id="kSendBtn" style="padding:10px;font-size:1.1rem;display:none;margin-top:4px" onclick="submitKAnswer()">שלח ←</button>`;
+    setTimeout(() => {
+      const inp = document.getElementById('kAnswerInput');
+      if (inp) {
+        inp.focus();
+        inp.addEventListener('input', function () {
+          const btn = document.getElementById('kSendBtn');
+          if (btn) btn.style.display = this.value.trim() ? 'block' : 'none';
+        });
+      }
+      setupSpeechRecognition('kAnswerInput', 'kMicBtn', 'kSendBtn', submitKAnswer);
+    }, 60);
+  } else {
+    turnInfo.textContent = `⏳ התור של ${activeName}...`;
+    controls.innerHTML = '';
+  }
+}
+
+function submitKAnswer() {
+  const inp = document.getElementById('kAnswerInput');
+  const text = inp ? inp.value.trim() : '';
+  playerAction('answer', { text });
+}
+
+function playerAction(type, payload) {
+  fb.ref('rooms/' + myRoomCode + '/state/pendingAction').set({
+    type, payload, by: myDeviceId, ts: Date.now()
+  });
+}
+
+function hostHandleTimeout() {
+  if (kProcessingLock || !roomState || roomState.state.phase !== 'question') return;
+  processAction(roomState, { type: 'answer', payload: { text: '' }, by: roomState.state.activePlayerId });
+}
+
+function processPendingAction(room) {
+  const action = room.state && room.state.pendingAction;
+  if (!action || kProcessingLock) return;
+  kProcessingLock = true;
+  processAction(room, action).finally(() => { kProcessingLock = false; });
+}
+
+// The single place multiplayer scores/phases change — always runs on the
+// host device, whether triggered by a player's queued action or a timeout
+// the host detected locally.
+function processAction(room, action) {
+  const round = ROUNDS.find(r => r.id === room.state.roundId);
+  const updates = { 'state/pendingAction': null };
+
+  if (action.type === 'answer') {
+    const q = QUESTIONS[room.state.roundId][room.state.questionOrder[room.state.questionIndex]];
+    const text = action.payload.text || '';
+    let success, message;
+    if (room.state.roundId === 'tmonot') {
+      const isGreen = q.mode === 'true';
+      const tooClose = isTooCloseToCorrect(text, q.correct);
+      if (isGreen) { success = tooClose; message = success ? 'נכון! תשובה אמיתית התקבלה' : 'פסול – היית צריך תשובה אמיתית'; }
+      else { success = !tooClose && text.length > 0; message = success ? 'חרטוט מוצלח!' : (tooClose ? 'פסול – קרוב מדי לנכון' : 'פסול – תשובה ריקה'); }
+    } else {
+      const tooClose = isTooCloseToCorrect(text, q.correct);
+      if (!text) { success = false; message = 'פסול – לא הוקלדה תשובה (או שנגמר הזמן)'; }
+      else if (tooClose) { success = false; message = 'פסול – התשובה קרובה מדי לנכונה!'; }
+      else { success = true; message = 'חרטוט מוצלח! האפליקציה אישרה'; }
+    }
+    const activeId = room.state.activePlayerId;
+    let scoreDelta = 0;
+    if (success) scoreDelta = round.points;
+    else if (room.state.roundId === 'dynamite') scoreDelta = -(round.penalty || 2);
+
+    updates['players/' + activeId + '/score'] = Math.max(0, (room.players[activeId].score || 0) + scoreDelta);
+    updates['state/lastResult'] = { success, message, points: scoreDelta, playerName: room.players[activeId].name };
+    updates['state/phase'] = 'result';
+    updates['state/timerEndsAt'] = null;
+  } else if (action.type === 'guess') {
+    updates['state/phase'] = 'storyJudge';
+    updates['state/pendingGuess'] = action.payload.guess;
+  } else if (action.type === 'storyJudge') {
+    const guesserId = room.state.guesserPlayerId;
+    const tellerId = room.state.activePlayerId;
+    if (action.payload.correct) {
+      updates['players/' + guesserId + '/score'] = (room.players[guesserId].score || 0) + round.points;
+      updates['state/lastResult'] = { success: true, message: `${room.players[guesserId].name} ניחש/ה נכון!`, points: round.points, playerName: room.players[guesserId].name };
+    } else {
+      updates['players/' + tellerId + '/score'] = (room.players[tellerId].score || 0) + round.points;
+      updates['state/lastResult'] = { success: true, message: `${room.players[tellerId].name} הצליח/ה לרמות!`, points: round.points, playerName: room.players[tellerId].name };
+    }
+    updates['state/phase'] = 'result';
+  }
+
+  return fb.ref('rooms/' + myRoomCode).update(updates);
+}
+
+function renderKStoryJudge(room) {
+  document.getElementById('kExplainBlock').style.display = 'none';
+  document.getElementById('kQuestionBlock').style.display = 'none';
+  document.getElementById('kResultBlock').style.display = 'none';
+  document.getElementById('kNextWrap').style.display = 'none';
+  const jb = document.getElementById('kJudgeBlock');
+  jb.style.display = 'block';
+  const tellerId = room.state.activePlayerId;
+  const guesserId = room.state.guesserPlayerId;
+  const guesserName = (room.players[guesserId] || {}).name || '?';
+  const tellerName = (room.players[tellerId] || {}).name || '?';
+  const guessLabel = room.state.pendingGuess ? 'מאומת' : 'מחורטט';
+
+  if (myDeviceId === tellerId) {
+    jb.innerHTML = `
+      <h3>${guesserName} ניחש/ה: ${guessLabel}</h3>
+      <p style="margin:8px 0">האם הניחוש נכון?</p>
+      <div class="action-row">
+        <button class="big-btn success-btn" onclick="playerAction('storyJudge',{correct:true})">כן, נכון</button>
+        <button class="big-btn danger-btn" onclick="playerAction('storyJudge',{correct:false})">לא, טעה/תה</button>
+      </div>`;
+  } else {
+    jb.innerHTML = `<h3>${guesserName} ניחש/ה: ${guessLabel}</h3><p style="margin-top:8px">ממתינים ש${tellerName} יגיד/תגיד אם זה נכון...</p>`;
+  }
+}
+
+function renderKResult(room) {
+  document.getElementById('kExplainBlock').style.display = 'none';
+  document.getElementById('kQuestionBlock').style.display = 'none';
+  document.getElementById('kJudgeBlock').style.display = 'none';
+  const r = room.state.lastResult || {};
+  const detail = r.points > 0 ? `+${r.points} נקודות ל${r.playerName}`
+    : r.points < 0 ? `−${Math.abs(r.points)} נקודות ל${r.playerName}`
+    : 'לא נוספו נקודות';
+  const block = document.getElementById('kResultBlock');
+  block.style.display = 'block';
+  block.innerHTML = `
+    <div class="result-banner ${r.success ? 'success' : 'fail'}">
+      ${r.success ? '✅ ' : '❌ '}${r.message || ''}
+      <div class="detail">${detail}</div>
+    </div>`;
+  document.getElementById('kNextWrap').style.display = isHostDevice ? 'block' : 'none';
+}
+
+function hostNextQuestion() {
+  const room = roomState;
+  const nextIdx = room.state.questionIndex + 1;
+  const order = room.order || [];
+  if (nextIdx >= room.state.questionOrder.length) {
+    const nextRoundIdx = room.state.roundQueueIndex + 1;
+    const rounds = room.selectedRounds || selectedRounds;
+    if (nextRoundIdx >= rounds.length) {
+      fb.ref('rooms/' + myRoomCode + '/state/phase').set('finished');
+      return;
+    }
+    fb.ref('rooms/' + myRoomCode + '/state').update({
+      phase: 'explain',
+      roundQueueIndex: nextRoundIdx,
+      roundId: rounds[nextRoundIdx],
+      currentPlayerIdx: (room.state.currentPlayerIdx + 1) % order.length
+    });
+    return;
+  }
+  const nextPlayerIdx = (room.state.currentPlayerIdx + 1) % order.length;
+  startKQuestion(room.state.roundId, room.state.questionOrder, nextIdx, nextPlayerIdx);
+}
+
+function renderKFinished(room) {
+  showFinalResults(Object.values(room.players || {}));
+}
+
+function showKScoresModal() {
+  if (!roomState || !roomState.players) return;
+  const sorted = Object.values(roomState.players).sort((a, b) => b.score - a.score);
+  const rows = sorted.map((p, i) => `${i + 1}. ${p.name} — ${p.score} נק׳`).join('<br>');
+  showModal('📊 ניקוד נוכחי', rows || 'אין עדיין נתונים');
+}
+
 // init
 renderNameInputs();
-renderRounds();
+renderRounds('roundsList');
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {
