@@ -1971,7 +1971,7 @@ function processAction(room, action) {
     else if (room.state.roundId === 'dynamite') scoreDelta = -(round.penalty || 2);
 
     updates['players/' + activeId + '/score'] = Math.max(0, (room.players[activeId].score || 0) + scoreDelta);
-    updates['state/lastResult'] = { success, message, points: scoreDelta, playerName: room.players[activeId].name };
+    updates['state/lastResult'] = { success, message, points: scoreDelta, playerName: room.players[activeId].name, answerText: text };
     updates['state/phase'] = 'result';
     updates['state/timerEndsAt'] = null;
   } else if (action.type === 'guess') {
@@ -2019,6 +2019,10 @@ function renderKStoryJudge(room) {
   }
 }
 
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
 function renderKResult(room) {
   document.getElementById('kExplainBlock').style.display = 'none';
   document.getElementById('kQuestionBlock').style.display = 'none';
@@ -2027,11 +2031,15 @@ function renderKResult(room) {
   const detail = r.points > 0 ? `+${r.points} נקודות ל${r.playerName}`
     : r.points < 0 ? `−${Math.abs(r.points)} נקודות ל${r.playerName}`
     : 'לא נוספו נקודות';
+  const answerLine = r.answerText
+    ? `<div style="margin:8px 0;font-style:italic">${r.playerName} ענה/תה: "${escapeHtml(r.answerText)}"</div>`
+    : '';
   const block = document.getElementById('kResultBlock');
   block.style.display = 'block';
   block.innerHTML = `
     <div class="result-banner ${r.success ? 'success' : 'fail'}">
       ${r.success ? '✅ ' : '❌ '}${r.message || ''}
+      ${answerLine}
       <div class="detail">${detail}</div>
     </div>`;
   document.getElementById('kNextWrap').style.display = isHostDevice ? 'block' : 'none';
