@@ -585,7 +585,8 @@
 <!-- MODE SELECT -->
 <div id="modeSelect" class="screen active">
   <div class="container">
-    <div class="logo-area">
+    <div class="logo-area" style="position:relative">
+      <button onclick="showInfoScreen()" title="הוראות משחק" style="position:absolute;top:0;left:0;width:34px;height:34px;border-radius:50%;background:var(--gold);border:3px solid #000;font-weight:900;font-size:1rem;cursor:pointer;box-shadow:2px 2px 0 #000;font-family:inherit">i</button>
       <h1>חרטטן!</h1>
       <div class="tagline">רק תשובות לא נכונות!</div>
       <div class="based-on">מבוסס על המשחק והשעשועון חרטטוני<br>של אור בוטבול ועמרי הכהן</div>
@@ -598,6 +599,29 @@
     <div class="footer-note">
       במצב אונליין צריך חיבור לאינטרנט ופרויקט Firebase חינמי מוגדר מראש (הוראות בתחילת קובץ הקוד).
     </div>
+  </div>
+</div>
+
+<!-- INFO / INSTRUCTIONS -->
+<div id="infoScreen" class="screen">
+  <div class="container">
+    <div class="logo-area" style="margin-bottom:14px"><h1 style="font-size:2.3rem">חרטטן!</h1></div>
+    <div class="card">
+      <div class="section-title">ℹ️ איך משחקים?</div>
+      <p style="line-height:1.7">
+        בכל סיבוב עונים בכוונה <strong>תשובה שגויה</strong> אבל משכנעת – לא כל שטות, אלא משהו שנשמע כאילו יכול להיות נכון.
+        תשובה שהיא <strong>נכונה בפועל</strong>, או שרחוקה מדי מהנושא, נפסלת.
+      </p>
+      <p style="line-height:1.7;margin-top:10px">
+        <strong>מסך אחד:</strong> כולם סביב מכשיר אחד, עונים בכתב או בקול, והאפליקציה בודקת אוטומטית.<br>
+        <strong>שחקו אונליין:</strong> כל שחקן מהטלפון שלו, עונים בעל פה, והמנחה שומע ומחליט אם התשובה תקינה.
+      </p>
+    </div>
+    <div class="card">
+      <div class="section-title">📋 הסיבובים</div>
+      <div id="infoRoundsList"></div>
+    </div>
+    <button class="big-btn" style="background:#eee" onclick="showScreen('modeSelect')">← חזרה</button>
   </div>
 </div>
 
@@ -874,9 +898,9 @@ const ROUNDS = [
     shortDesc: 'שאלות ברצף – תשובה שגויה אבל בקטגוריה',
     explain: [
       'המנחה שואל שאלות במהירות.',
-      'השחקן מקליד תשובה <strong>שגויה</strong> שעדיין קשורה לנושא.',
+      'עונים תשובה <strong>שגויה</strong> שעדיין קשורה לנושא.',
       'יש לכם {TIME} שניות לענות על כל שאלה.',
-      'האפליקציה בודקת אוטומטית אם התשובה קרובה מדי לנכונה → פוסלת.',
+      'תשובה קרובה מדי לנכונה – נפסלת.',
       'אם היא שונה מספיק → מקבלים נקודה.',
       'כל תשובה מוצלחת = 1 נקודה.'
     ],
@@ -888,9 +912,9 @@ const ROUNDS = [
     name: '🥊 ראש בראש',
     shortDesc: 'תשובה מוצלחת מזכה',
     explain: [
-      'כל שחקן מקליד תשובה שגויה לשאלה.',
+      'כל שחקן עונה תשובה שגויה לשאלה.',
       'יש {TIME} שניות לכל תשובה.',
-      'האפליקציה פוסלת אוטומטית תשובות שקרובות מדי לנכונה.',
+      'תשובה שקרובה מדי לנכונה נפסלת.',
       'תשובה שונה מספיק = נקודה.',
       'מי עם יותר נקודות בסוף מוביל.'
     ],
@@ -903,8 +927,8 @@ const ROUNDS = [
     shortDesc: '{TIME} שניות – אחרת מפסידים נקודות',
     explain: [
       'שאלה אחת עוברת בין השחקנים.',
-      'כל אחד חייב להקליד תשובה שגויה תוך {TIME} שניות.',
-      'האפליקציה בודקת אוטומטית.',
+      'כל אחד חייב לענות תשובה שגויה תוך {TIME} שניות.',
+      'תשובה קרובה מדי לנכונה, או איחור – פסולים.',
       'כישלון או איחור = הפסד של 2 נקודות.'
     ],
     time: 7,
@@ -1244,6 +1268,10 @@ const CATEGORY_LABELS = {
   instrument: "כלי נגינה", sport: "ספורט", holiday: "חג", clothing: "לבוש", drink: "משקה",
   feeling: "הרגשה", object: "חפץ", profession: "מקצוע", place: "מקום", number: "מספר", capital: "בירה"
 };
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
 
 // ========== SETUP ==========
 function changePlayers(delta) {
@@ -1756,6 +1784,19 @@ function showScreen(id) {
   if (el) el.classList.add('active');
 }
 
+function showInfoScreen() {
+  const list = document.getElementById('infoRoundsList');
+  list.innerHTML = ROUNDS.map(r => `
+    <div style="margin-bottom:16px">
+      <h3 style="margin-bottom:6px">${r.name}</h3>
+      <ul class="how">
+        ${r.explain.map(l => `<li>${l.replace(/\{TIME\}/g, r.time)}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+  showScreen('infoScreen');
+}
+
 function enterKahootMode() {
   if (!fbReady) {
     showModal('🔥 צריך להגדיר Firebase', 'כדי לשחק במצב אונליין (כל שחקן מהטלפון שלו) צריך קודם לחבר פרויקט Firebase חינמי. ההוראות המלאות נמצאות בתחילת קובץ הקוד (חפשו "הגדרות Firebase"). אחרי ההגדרה שמרו את הקובץ מחדש.');
@@ -2057,6 +2098,7 @@ function hostJudgeVerified(guesserWasCorrect) {
 }
 
 function renderKResult(room) {
+  clearInterval(kTimerInterval);
   document.getElementById('kExplainBlock').style.display = 'none';
   document.getElementById('kQuestionBlock').style.display = 'none';
   document.getElementById('kJudgeBlock').style.display = 'none';
