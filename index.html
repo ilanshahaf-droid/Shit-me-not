@@ -700,6 +700,8 @@
 
     <div id="kJudgeBlock" class="judge-area" style="display:none"></div>
 
+    <div id="kScoreboardBlock" class="card" style="display:none"></div>
+
     <div id="kNextWrap" style="text-align:center;margin-top:14px;display:none">
       <button class="big-btn next-btn" onclick="hostNextQuestion()">השאלה הבאה →</button>
     </div>
@@ -967,7 +969,17 @@ const QUESTIONS = {
     { text: "מה עושה נגר?", correct: ["עובד עם עץ", "בונה רהיטים", "עבודות עץ"] },
     { text: "איזה כוכב לכת הכי קרוב לשמש?", correct: ["כוכב חמה", "מרקורי"], category: "space" },
     { text: "מה שמים על פיצה בדרך כלל?", correct: ["גבינה", "רוטב עגבניות", "זיתים"], category: "food" },
-    { text: "איזה בעל חיים נותן לנו צמר?", correct: ["כבשה", "כבש", "כבשים"], category: "animal" }
+    { text: "איזה בעל חיים נותן לנו צמר?", correct: ["כבשה", "כבש", "כבשים"], category: "animal" },
+    { text: "מה בירת איטליה?", correct: ["רומא"], category: "capital" },
+    { text: "איזה צבע הוא ענן גשם?", correct: ["אפור", "אפורה"], category: "color" },
+    { text: "כמה חודשים יש בשנה?", correct: ["12", "שתים עשרה", "שנים עשר"], category: "number" },
+    { text: "איזה כלי תחבורה שט על המים?", correct: ["סירה", "ספינה", "יאכטה"], category: "vehicle" },
+    { text: "איזו חיה חיה באוקיינוס וזורקת מים מהראש?", correct: ["לוויתן", "דולפין"], category: "animal" },
+    { text: "מה שמים בקפה כדי שיהיה מתוק?", correct: ["סוכר"], category: "food" },
+    { text: "איזה יום הוא האחרון בשבוע העבודה בישראל?", correct: ["חמישי", "יום חמישי"], category: "weekday" },
+    { text: "איזה פרי צהוב וארוך?", correct: ["בננה"], category: "fruit" },
+    { text: "מה עושים במגרש כדורגל?", correct: ["משחקים כדורגל", "בועטים בכדור"] },
+    { text: "איזה כוכב לכת יש לו טבעות?", correct: ["שבתאי", "סטורן"], category: "space" }
   ],
   head: [
     { text: "מה הדבר הכי חם בעולם?", correct: ["שמש", "השמש", "ליבת כדור הארץ", "לבה"] },
@@ -989,7 +1001,17 @@ const QUESTIONS = {
     { text: "איך קוראים למי שמטיס מטוס?", correct: ["טייס", "טייסת"], category: "profession" },
     { text: "מה עושים עם מחט וחוט?", correct: ["תופרים", "תפירה"] },
     { text: "איזה כלי רכב נוסע על מסילה?", correct: ["רכבת"], category: "vehicle" },
-    { text: "מה קורה לקרח כשמחממים אותו?", correct: ["נמס", "הופך למים"], category: "process" }
+    { text: "מה קורה לקרח כשמחממים אותו?", correct: ["נמס", "הופך למים"], category: "process" },
+    { text: "איזה מקצוע מטפל בבעלי חיים חולים?", correct: ["וטרינר", "וטרינרית"], category: "profession" },
+    { text: "מה קורה לשלג כשהטמפרטורה עולה?", correct: ["נמס", "מתמוסס"], category: "process" },
+    { text: "איזה ספורט משחקים על קרח?", correct: ["הוקי"], category: "sport" },
+    { text: "איפה גדלים דובי קוטב?", correct: ["הקוטב הצפוני", "ארקטיקה"], category: "place" },
+    { text: "מה עושה כבאי?", correct: ["מכבה שריפות", "כיבוי אש"] },
+    { text: "איזה חלק בגוף משמש לשמיעה?", correct: ["אוזן", "אוזניים"], category: "bodypart" },
+    { text: "איזה פרי צהוב וחמוץ?", correct: ["לימון"], category: "fruit" },
+    { text: "כמה ימים יש בחודש פברואר בדרך כלל?", correct: ["28", "עשרים ושמונה"], category: "number" },
+    { text: "איזו בהמה משמשת לרכיבה במדבר?", correct: ["גמל"], category: "animal" },
+    { text: "מה עושים בבריכה?", correct: ["שוחים", "שחייה"] }
   ],
   dynamite: [
     { text: "מה עושים עם מטרייה?", correct: ["מתגוננים מגשם", "הגנה מגשם", "פותחים בגשם"] },
@@ -1007,7 +1029,15 @@ const QUESTIONS = {
     { text: "מה עושים במספרה?", correct: ["מסתפרים", "תספורת"] },
     { text: "איזו עונה הכי קרה בשנה?", correct: ["חורף"], category: "season" },
     { text: "מה שמים ברגליים כשקר?", correct: ["גרביים", "נעליים", "מגפיים"], category: "clothing" },
-    { text: "איזה כלי שומר על האוכל קר?", correct: ["מקרר"], category: "object" }
+    { text: "איזה כלי שומר על האוכל קר?", correct: ["מקרר"], category: "object" },
+    { text: "איזה משקה חם שותים בבוקר?", correct: ["קפה"], category: "drink" },
+    { text: "מה הצבע של השמש?", correct: ["צהוב"], category: "color" },
+    { text: "איזה בעל חיים נובח?", correct: ["כלב"], category: "animal" },
+    { text: "כמה עיניים יש לאדם?", correct: ["2", "שתיים", "שניים"], category: "number" },
+    { text: "איזה חג חוגגים עם סופגניות?", correct: ["חנוכה"], category: "holiday" },
+    { text: "מה שמים על הראש בשמש?", correct: ["כובע"], category: "clothing" },
+    { text: "איזה כלי משמש לכתיבה?", correct: ["עט", "עיפרון"], category: "object" },
+    { text: "מה מרגישים אחרי ריצה ארוכה?", correct: ["עייף", "עייפה"], category: "feeling" }
   ],
   tmonot: [
     { text: "בננה", correct: ["בננה", "בננות", "צהוב", "צהובה", "בננה צהובה", "בננות צהובות", "banana", "bananas"], mode: "true",
@@ -1045,7 +1075,19 @@ const QUESTIONS = {
     { text: "מחשב נייד", correct: ["מחשב", "מחשב נייד", "לפטופ", "laptop", "computer"], mode: "true",
       img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=400&h=300&q=80" },
     { text: "מטרייה", correct: ["מטרייה", "מטריות", "umbrella"], mode: "fake",
-      img: "https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?auto=format&fit=crop&w=400&h=300&q=80" }
+      img: "https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "מטוס", correct: ["מטוס", "מטוסים", "airplane", "plane"], mode: "true",
+      img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "גלידה", correct: ["גלידה", "גלידות", "ice cream"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "פרפר", correct: ["פרפר", "פרפרים", "butterfly"], mode: "true",
+      img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "נעליים", correct: ["נעליים", "נעל", "shoes", "sneakers"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "תיק גב", correct: ["תיק", "תיק גב", "backpack", "bag"], mode: "true",
+      img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=400&h=300&q=80" },
+    { text: "מפתחות", correct: ["מפתח", "מפתחות", "key", "keys"], mode: "fake",
+      img: "https://images.unsplash.com/photo-1582139329536-e7284fece509?auto=format&fit=crop&w=400&h=300&q=80" }
   ],
   verified: [
     { text: "ספר שני דברים על עצמך – אחד אמיתי ואחד מומצא. השני מנחש.", correct: [], manual: true },
@@ -1057,7 +1099,12 @@ const QUESTIONS = {
     { text: "מה הדבר הכי אמיץ שעשית? (אמיתי או מומצא)", correct: [], manual: true },
     { text: "ספר על מפגש מקרי עם מפורסם/ת – אמיתי או מומצא?", correct: [], manual: true },
     { text: "מה הכישרון הנסתר שלך? אמיתי או מומצא?", correct: [], manual: true },
-    { text: "ספר על תקלה מביכה במקום העבודה – אמיתית או מומצאת?", correct: [], manual: true }
+    { text: "ספר על תקלה מביכה במקום העבודה – אמיתית או מומצאת?", correct: [], manual: true },
+    { text: "מה השקר הכי גדול שסיפרת פעם? אמיתי או מומצא?", correct: [], manual: true },
+    { text: "ספר על פדיחה בזמן דייט – אמיתי או מומצא?", correct: [], manual: true },
+    { text: "מה התחפושת הכי משוגעת שלבשת? אמיתי או מומצא?", correct: [], manual: true },
+    { text: "ספר איך הכרת את החבר/ה הכי טוב/ה שלך – אמיתי או מומצא?", correct: [], manual: true },
+    { text: "מה הפחד הכי מוזר שלך? אמיתי או מומצא?", correct: [], manual: true }
   ]
 };
 
@@ -1187,6 +1234,14 @@ function isInCategory(answer, categoryKey) {
   return false;
 }
 
+// Hebrew display names for categories — shown only to the host as a judging aid.
+const CATEGORY_LABELS = {
+  fruit: "פרי", animal: "בעל חיים", color: "צבע", vehicle: "כלי תחבורה", food: "מאכל",
+  bodypart: "חלק בגוף", weekday: "יום בשבוע", month: "חודש", season: "עונה", space: "גרם שמיים",
+  instrument: "כלי נגינה", sport: "ספורט", holiday: "חג", clothing: "לבוש", drink: "משקה",
+  feeling: "הרגשה", object: "חפץ", profession: "מקצוע", place: "מקום", number: "מספר", capital: "בירה"
+};
+
 // ========== SETUP ==========
 function changePlayers(delta) {
   playerCount = Math.max(2, Math.min(99, playerCount + delta));
@@ -1271,7 +1326,7 @@ function showExplainForCurrentRound() {
 
 function beginRound() {
   const qs = QUESTIONS[currentRoundId] || [];
-  const take = Math.min(qs.length, Math.max(4, Math.min(7, players.length + 2)));
+  const take = Math.min(qs.length, Math.max(8, players.length + 6));
   currentRoundQuestions = [...qs].sort(() => Math.random() - 0.5).slice(0, take);
   currentQIndex = 0;
   currentPlayerIndex = 0;
@@ -1822,13 +1877,9 @@ function onRoomUpdate(room) {
 
   if (phase === 'explain') renderKExplain(room);
   else if (phase === 'question') renderKQuestion(room);
-  else if (phase === 'storyJudge') renderKStoryJudge(room);
   else if (phase === 'result') renderKResult(room);
+  else if (phase === 'scoreboard') renderKScoreboard(room);
   else if (phase === 'finished') renderKFinished(room);
-
-  // Only the host mutates scores/phase, so there's a single writer resolving
-  // whatever a player device just queued (an answer, a guess, a judgment).
-  if (isHostDevice) processPendingAction(room);
 }
 
 function renderKExplain(room) {
@@ -1838,6 +1889,7 @@ function renderKExplain(room) {
   document.getElementById('kResultBlock').style.display = 'none';
   document.getElementById('kJudgeBlock').style.display = 'none';
   document.getElementById('kNextWrap').style.display = 'none';
+  document.getElementById('kScoreboardBlock').style.display = 'none';
   document.getElementById('kRoundLabel').textContent = round.name;
   document.getElementById('kExplainTitle').textContent = round.name;
   document.getElementById('kExplainText').innerHTML = round.explain
@@ -1851,7 +1903,7 @@ function hostBeginQuestionPhase() {
   const roundId = room.state.roundId;
   const qs = QUESTIONS[roundId] || [];
   const order = room.order || [];
-  const take = Math.min(qs.length, Math.max(4, Math.min(7, order.length + 2)));
+  const take = Math.min(qs.length, Math.max(8, order.length + 6));
   const indices = qs.map((_, i) => i).sort(() => Math.random() - 0.5).slice(0, take);
   startKQuestion(roundId, indices, 0, room.state.currentPlayerIdx || 0);
 }
@@ -1868,8 +1920,6 @@ function startKQuestion(roundId, questionOrder, questionIndex, currentPlayerIdx)
     currentPlayerIdx: currentPlayerIdx,
     activePlayerId: activePlayerId,
     guesserPlayerId: roundId === 'verified' ? order[(currentPlayerIdx + 1) % order.length] : null,
-    pendingAction: null,
-    pendingGuess: null,
     lastResult: null,
     timerEndsAt: (round.manual || roundId === 'verified') ? null : (Date.now() + round.time * 1000)
   });
@@ -1887,6 +1937,7 @@ function renderKQuestion(room) {
   document.getElementById('kResultBlock').style.display = 'none';
   document.getElementById('kJudgeBlock').style.display = 'none';
   document.getElementById('kNextWrap').style.display = 'none';
+  document.getElementById('kScoreboardBlock').style.display = 'none';
   document.getElementById('kRoundLabel').textContent = round.name;
   document.getElementById('kCurrentRoundName').textContent = round.id === 'tmonot' ? '' : round.name;
 
@@ -1926,170 +1977,97 @@ function renderKQuestion(room) {
 
   if (round.id === 'verified') {
     const guesserName = (room.players[room.state.guesserPlayerId] || {}).name || '?';
-    if (amActive) {
-      turnInfo.textContent = `התור שלך לספר! ${guesserName} ינחש/תנחש`;
-      controls.innerHTML = `<p style="color:white;text-align:center">ספר/י בקול שני דברים על עצמך – אחד אמיתי ואחד מומצא.</p>`;
-    } else if (myDeviceId === room.state.guesserPlayerId) {
-      turnInfo.textContent = `${activeName} מספר/ת עכשיו – מה דעתך?`;
+    if (amActive) turnInfo.textContent = `🎙️ התור שלך לספר! ${guesserName} ינחש/תנחש`;
+    else if (myDeviceId === room.state.guesserPlayerId) turnInfo.textContent = `${activeName} מספר/ת עכשיו – מה דעתך?`;
+    else turnInfo.textContent = `${activeName} מספר/ת ל-${guesserName}...`;
+
+    if (isHostDevice) {
       controls.innerHTML = `
+        <p style="color:white;text-align:center;margin-bottom:8px">מי צדק בניחוש?</p>
         <div class="action-row">
-          <button class="big-btn success-btn" onclick="playerAction('guess',{guess:true})">מאומת</button>
-          <button class="big-btn danger-btn" onclick="playerAction('guess',{guess:false})">מחורטט</button>
+          <button class="big-btn success-btn" onclick="hostJudgeVerified(true)">${guesserName} ניחש/ה נכון</button>
+          <button class="big-btn danger-btn" onclick="hostJudgeVerified(false)">${activeName} רימ/תה בהצלחה</button>
         </div>`;
     } else {
-      turnInfo.textContent = `${activeName} מספר/ת ל-${guesserName}...`;
       controls.innerHTML = '<div class="waiting-note">🎧 מקשיבים...</div>';
     }
     return;
   }
 
-  if (amActive) {
-    turnInfo.textContent = '🎯 התור שלך!';
+  turnInfo.textContent = amActive ? '🎙️ התור שלך – ענה/עני בעל פה!' : `🎙️ התור של ${activeName} – עונה/ת בעל פה`;
+
+  if (isHostDevice) {
+    const correctLine = q.correct && q.correct.length
+      ? `<div style="margin:6px 0"><strong>תשובות נכונות (לא תקין אם נאמרו):</strong> ${q.correct.slice(0, 6).join(', ')}</div>`
+      : '';
+    const categoryLine = q.category
+      ? `<div style="margin:6px 0"><strong>קטגוריה מותרת:</strong> ${CATEGORY_LABELS[q.category] || q.category}</div>`
+      : '';
     controls.innerHTML = `
-      <div class="answer-box">
-        <input type="text" id="kAnswerInput" placeholder="הקלד או לחץ על המיקרופון..." autocomplete="off" enterkeyhint="done">
-        <button class="mic-btn" id="kMicBtn" type="button" title="הכרה קולית">🎤</button>
+      <div style="background:#fff;border:3px solid #000;border-radius:14px;padding:10px 14px;margin-bottom:10px;font-size:0.92rem">
+        ${correctLine}${categoryLine}
       </div>
-      <button class="big-btn next-btn" id="kSendBtn" style="padding:10px;font-size:1.1rem;display:none;margin-top:4px" onclick="submitKAnswer()">שלח ←</button>`;
-    setTimeout(() => {
-      const inp = document.getElementById('kAnswerInput');
-      if (inp) {
-        inp.focus();
-        inp.addEventListener('input', function () {
-          const btn = document.getElementById('kSendBtn');
-          if (btn) btn.style.display = this.value.trim() ? 'block' : 'none';
-        });
-      }
-      setupSpeechRecognition('kAnswerInput', 'kMicBtn', 'kSendBtn', submitKAnswer);
-    }, 60);
+      <div class="action-row">
+        <button class="big-btn success-btn" onclick="hostJudgeAnswer(true)">✅ תקין</button>
+        <button class="big-btn danger-btn" onclick="hostJudgeAnswer(false)">❌ לא תקין</button>
+      </div>`;
   } else {
-    turnInfo.textContent = `⏳ התור של ${activeName}...`;
-    controls.innerHTML = '';
+    controls.innerHTML = '<div class="waiting-note">🎧 מקשיבים...</div>';
   }
-}
-
-function submitKAnswer() {
-  const inp = document.getElementById('kAnswerInput');
-  const text = inp ? inp.value.trim() : '';
-  playerAction('answer', { text });
-}
-
-function playerAction(type, payload) {
-  fb.ref('rooms/' + myRoomCode + '/state/pendingAction').set({
-    type, payload, by: myDeviceId, ts: Date.now()
-  });
 }
 
 function hostHandleTimeout() {
-  if (kProcessingLock || !roomState || roomState.state.phase !== 'question') return;
-  processAction(roomState, { type: 'answer', payload: { text: '' }, by: roomState.state.activePlayerId });
+  if (!roomState || roomState.state.phase !== 'question') return;
+  hostJudgeAnswer(false);
 }
 
-function processPendingAction(room) {
-  const action = room.state && room.state.pendingAction;
-  if (!action || kProcessingLock) return;
-  kProcessingLock = true;
-  processAction(room, action).finally(() => { kProcessingLock = false; });
-}
-
-// The single place multiplayer scores/phases change — always runs on the
-// host device, whether triggered by a player's queued action or a timeout
-// the host detected locally.
-function processAction(room, action) {
+function hostJudgeAnswer(success) {
+  const room = roomState;
   const round = ROUNDS.find(r => r.id === room.state.roundId);
-  const updates = { 'state/pendingAction': null };
+  const activeId = room.state.activePlayerId;
+  let scoreDelta = 0;
+  if (success) scoreDelta = round.points;
+  else if (room.state.roundId === 'dynamite') scoreDelta = -(round.penalty || 2);
 
-  if (action.type === 'answer') {
-    const q = QUESTIONS[room.state.roundId][room.state.questionOrder[room.state.questionIndex]];
-    const text = action.payload.text || '';
-    let success, message;
-    if (room.state.roundId === 'tmonot') {
-      const isGreen = q.mode === 'true';
-      const tooClose = isTooCloseToCorrect(text, q.correct);
-      if (isGreen) { success = tooClose; message = success ? 'נכון! תשובה אמיתית התקבלה' : 'פסול – היית צריך תשובה אמיתית'; }
-      else { success = !tooClose && text.length > 0; message = success ? 'חרטוט מוצלח!' : (tooClose ? 'פסול – קרוב מדי לנכון' : 'פסול – תשובה ריקה'); }
-    } else {
-      const tooClose = isTooCloseToCorrect(text, q.correct);
-      if (!text) { success = false; message = 'פסול – לא הוקלדה תשובה (או שנגמר הזמן)'; }
-      else if (tooClose) { success = false; message = 'פסול – התשובה קרובה מדי לנכונה!'; }
-      else if (q.category && !isInCategory(text, q.category)) { success = false; message = 'פסול – התשובה לא שייכת לקטגוריה'; }
-      else { success = true; message = 'חרטוט מוצלח! האפליקציה אישרה'; }
-    }
-    const activeId = room.state.activePlayerId;
-    let scoreDelta = 0;
-    if (success) scoreDelta = round.points;
-    else if (room.state.roundId === 'dynamite') scoreDelta = -(round.penalty || 2);
-
-    updates['players/' + activeId + '/score'] = Math.max(0, (room.players[activeId].score || 0) + scoreDelta);
-    updates['state/lastResult'] = { success, message, points: scoreDelta, playerName: room.players[activeId].name, answerText: text };
-    updates['state/phase'] = 'result';
-    updates['state/timerEndsAt'] = null;
-  } else if (action.type === 'guess') {
-    updates['state/phase'] = 'storyJudge';
-    updates['state/pendingGuess'] = action.payload.guess;
-  } else if (action.type === 'storyJudge') {
-    const guesserId = room.state.guesserPlayerId;
-    const tellerId = room.state.activePlayerId;
-    if (action.payload.correct) {
-      updates['players/' + guesserId + '/score'] = (room.players[guesserId].score || 0) + round.points;
-      updates['state/lastResult'] = { success: true, message: `${room.players[guesserId].name} ניחש/ה נכון!`, points: round.points, playerName: room.players[guesserId].name };
-    } else {
-      updates['players/' + tellerId + '/score'] = (room.players[tellerId].score || 0) + round.points;
-      updates['state/lastResult'] = { success: true, message: `${room.players[tellerId].name} הצליח/ה לרמות!`, points: round.points, playerName: room.players[tellerId].name };
-    }
-    updates['state/phase'] = 'result';
-  }
-
-  return fb.ref('rooms/' + myRoomCode).update(updates);
+  fb.ref('rooms/' + myRoomCode).update({
+    ['players/' + activeId + '/score']: Math.max(0, (room.players[activeId].score || 0) + scoreDelta),
+    'state/lastResult': { success, points: scoreDelta, playerName: room.players[activeId].name },
+    'state/phase': 'result',
+    'state/timerEndsAt': null
+  });
 }
 
-function renderKStoryJudge(room) {
-  document.getElementById('kExplainBlock').style.display = 'none';
-  document.getElementById('kQuestionBlock').style.display = 'none';
-  document.getElementById('kResultBlock').style.display = 'none';
-  document.getElementById('kNextWrap').style.display = 'none';
-  const jb = document.getElementById('kJudgeBlock');
-  jb.style.display = 'block';
-  const tellerId = room.state.activePlayerId;
+function hostJudgeVerified(guesserWasCorrect) {
+  const room = roomState;
+  const round = ROUNDS.find(r => r.id === room.state.roundId);
   const guesserId = room.state.guesserPlayerId;
-  const guesserName = (room.players[guesserId] || {}).name || '?';
-  const tellerName = (room.players[tellerId] || {}).name || '?';
-  const guessLabel = room.state.pendingGuess ? 'מאומת' : 'מחורטט';
-
-  if (myDeviceId === tellerId) {
-    jb.innerHTML = `
-      <h3>${guesserName} ניחש/ה: ${guessLabel}</h3>
-      <p style="margin:8px 0">האם הניחוש נכון?</p>
-      <div class="action-row">
-        <button class="big-btn success-btn" onclick="playerAction('storyJudge',{correct:true})">כן, נכון</button>
-        <button class="big-btn danger-btn" onclick="playerAction('storyJudge',{correct:false})">לא, טעה/תה</button>
-      </div>`;
+  const tellerId = room.state.activePlayerId;
+  const updates = { 'state/phase': 'result' };
+  if (guesserWasCorrect) {
+    updates['players/' + guesserId + '/score'] = (room.players[guesserId].score || 0) + round.points;
+    updates['state/lastResult'] = { success: true, points: round.points, playerName: room.players[guesserId].name, note: 'ניחש/ה נכון!' };
   } else {
-    jb.innerHTML = `<h3>${guesserName} ניחש/ה: ${guessLabel}</h3><p style="margin-top:8px">ממתינים ש${tellerName} יגיד/תגיד אם זה נכון...</p>`;
+    updates['players/' + tellerId + '/score'] = (room.players[tellerId].score || 0) + round.points;
+    updates['state/lastResult'] = { success: true, points: round.points, playerName: room.players[tellerId].name, note: 'הצליח/ה לרמות!' };
   }
-}
-
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  fb.ref('rooms/' + myRoomCode).update(updates);
 }
 
 function renderKResult(room) {
   document.getElementById('kExplainBlock').style.display = 'none';
   document.getElementById('kQuestionBlock').style.display = 'none';
   document.getElementById('kJudgeBlock').style.display = 'none';
+  document.getElementById('kScoreboardBlock').style.display = 'none';
   const r = room.state.lastResult || {};
   const detail = r.points > 0 ? `+${r.points} נקודות ל${r.playerName}`
     : r.points < 0 ? `−${Math.abs(r.points)} נקודות ל${r.playerName}`
     : 'לא נוספו נקודות';
-  const answerLine = r.answerText
-    ? `<div style="margin:8px 0;font-style:italic">${r.playerName} ענה/תה: "${escapeHtml(r.answerText)}"</div>`
-    : '';
+  const headline = r.note || (r.success ? 'תשובה תקינה!' : 'תשובה לא תקינה');
   const block = document.getElementById('kResultBlock');
   block.style.display = 'block';
   block.innerHTML = `
     <div class="result-banner ${r.success ? 'success' : 'fail'}">
-      ${r.success ? '✅ ' : '❌ '}${r.message || ''}
-      ${answerLine}
+      ${r.success ? '✅ ' : '❌ '}${escapeHtml(headline)}
       <div class="detail">${detail}</div>
     </div>`;
   document.getElementById('kNextWrap').style.display = isHostDevice ? 'block' : 'none';
@@ -2098,24 +2076,54 @@ function renderKResult(room) {
 function hostNextQuestion() {
   const room = roomState;
   const nextIdx = room.state.questionIndex + 1;
-  const order = room.order || [];
   if (nextIdx >= room.state.questionOrder.length) {
-    const nextRoundIdx = room.state.roundQueueIndex + 1;
-    const rounds = room.selectedRounds || selectedRounds;
-    if (nextRoundIdx >= rounds.length) {
-      fb.ref('rooms/' + myRoomCode + '/state/phase').set('finished');
-      return;
-    }
-    fb.ref('rooms/' + myRoomCode + '/state').update({
-      phase: 'explain',
-      roundQueueIndex: nextRoundIdx,
-      roundId: rounds[nextRoundIdx],
-      currentPlayerIdx: (room.state.currentPlayerIdx + 1) % order.length
-    });
+    // Round finished — show the standings prominently before moving on.
+    fb.ref('rooms/' + myRoomCode + '/state/phase').set('scoreboard');
     return;
   }
+  const order = room.order || [];
   const nextPlayerIdx = (room.state.currentPlayerIdx + 1) % order.length;
   startKQuestion(room.state.roundId, room.state.questionOrder, nextIdx, nextPlayerIdx);
+}
+
+function renderKScoreboard(room) {
+  document.getElementById('kExplainBlock').style.display = 'none';
+  document.getElementById('kQuestionBlock').style.display = 'none';
+  document.getElementById('kResultBlock').style.display = 'none';
+  document.getElementById('kJudgeBlock').style.display = 'none';
+  document.getElementById('kNextWrap').style.display = 'none';
+  const finishedRound = ROUNDS.find(r => r.id === room.state.roundId);
+  const sorted = Object.values(room.players || {}).sort((a, b) => b.score - a.score);
+  const medals = ['🥇', '🥈', '🥉'];
+  const rows = sorted.map((p, i) => `
+    <div class="final-row${i < 3 ? ' rank-' + (i + 1) : ''}">
+      <span>${medals[i] || ''} ${i + 1}. ${p.name}</span><span>${p.score} נק׳</span>
+    </div>`).join('');
+  const sb = document.getElementById('kScoreboardBlock');
+  sb.style.display = 'block';
+  sb.innerHTML = `
+    <h2 style="text-align:center;margin-bottom:4px">🏆 מצב הניקוד</h2>
+    <p style="text-align:center;color:#666;margin-bottom:14px">אחרי סיבוב "${finishedRound.name}"</p>
+    <div class="final-scores">${rows}</div>
+    ${isHostDevice ? `<button class="big-btn next-btn" style="margin-top:16px" onclick="hostAdvanceFromScoreboard()">לשלב הבא →</button>` : `<p style="text-align:center;color:#666;margin-top:14px">ממתינים שהמנחה ימשיך...</p>`}
+  `;
+}
+
+function hostAdvanceFromScoreboard() {
+  const room = roomState;
+  const nextRoundIdx = room.state.roundQueueIndex + 1;
+  const rounds = room.selectedRounds || selectedRounds;
+  if (nextRoundIdx >= rounds.length) {
+    fb.ref('rooms/' + myRoomCode + '/state/phase').set('finished');
+    return;
+  }
+  const order = room.order || [];
+  fb.ref('rooms/' + myRoomCode + '/state').update({
+    phase: 'explain',
+    roundQueueIndex: nextRoundIdx,
+    roundId: rounds[nextRoundIdx],
+    currentPlayerIdx: (room.state.currentPlayerIdx + 1) % order.length
+  });
 }
 
 function renderKFinished(room) {
